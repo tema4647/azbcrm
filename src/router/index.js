@@ -5,13 +5,21 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home
+    component: Home,
+    meta:{layout: 'MainLayout'}
   },
   {
     path: '/clients',
     name: 'clients',
-    component: () => import(/* webpackChunkName: "Clients" */ '../views/Clients.vue')
-  }
+    component: () => import(/* webpackChunkName: "clients" */ '../views/Clients.vue'),
+    meta:{layout: 'MainLayout'}
+  },
+  {
+    path: '/groups',
+    name: 'groups',
+    component: () => import(/* webpackChunkName: "groups" */ '../views/Groups.vue'),
+    meta:{layout: 'MainLayout'}
+  },
 ]
 
 const router = createRouter({

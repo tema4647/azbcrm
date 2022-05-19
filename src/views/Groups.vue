@@ -1,15 +1,11 @@
 <template>
   <div>
-    Clients
+   Groups
   </div>
 </template>
 
 <script>
   export default {
-    name:'Clients',
-
-    components:{
-    }
     
   }
 </script>

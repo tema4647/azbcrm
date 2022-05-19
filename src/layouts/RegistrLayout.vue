@@ -1,16 +1,12 @@
 <template>
   <div>
-    Clients
+
   </div>
 </template>
 
 <script>
   export default {
-    name:'Clients',
-
-    components:{
-    }
-    
+    name: 'RegistrLayout'
   }
 </script>
 

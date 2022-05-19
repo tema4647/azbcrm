@@ -1,30 +1,43 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/clients">Clients</router-link>
-  </nav>
+  <component :is="layout">
   <router-view/>
+</component>
 </template>
 
+<script>
+import MainLayout from '@/layouts/MainLayout'
+import RegistrLayout from '@/layouts/RegistrLayout'
+
+export default {
+  computed:{
+    layout(){
+      return (this.$route.meta.layout || 'RegistrLayout')
+    }
+  },
+  components:{
+    MainLayout,
+    RegistrLayout
+  }
+  
+}
+</script>
+
 <style lang="scss">
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+a{
+  text-decoration: none;
+  list-style: none;
+  color: #616161;
+}
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+  color: #616161;
 }
 </style>
