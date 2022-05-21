@@ -1,11 +1,11 @@
 <template>
   <div class="mainLayout">
-   <TopBar/>
+    <TopBar/>
     <div class="wrapper">
       <SaidBar/>
-      <MainBar>
+      <MainContent>
       <router-view/>
-      </MainBar>
+      </MainContent>
     </div>
   </div>
 </template>
@@ -13,7 +13,7 @@
 <script>
 import SaidBar from '@/components/SaidBar'
 import TopBar from '@/components/TopBar'
-import MainBar from '@/components/MainBar'
+import MainContent from '@/components/MainContent'
 
 
   export default {
@@ -21,8 +21,7 @@ import MainBar from '@/components/MainBar'
     components:{
       SaidBar,
       TopBar,
-      MainBar
-
+      MainContent
     }
   }
 </script>

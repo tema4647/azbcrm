@@ -28,6 +28,10 @@ export default {
   padding: 0;
   box-sizing: border-box;
 }
+html{
+  
+  font-size: 12px;
+}
 a{
   text-decoration: none;
   list-style: none;
