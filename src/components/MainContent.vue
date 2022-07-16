@@ -17,5 +17,6 @@
   height: calc(100vh - 70px);
   padding: 10px;
   background-color: white;
+
 }
 </style>
