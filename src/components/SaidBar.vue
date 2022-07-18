@@ -74,13 +74,13 @@ li {
   font-size: 18px;
   font-weight: 500;
   padding: 20px 10px;
-  width: 10%;
+  width: 200px;
   height: calc(100vh - 70px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   border-right:1px solid #dddddd;
-  background-color: #2e3743;
+  background-color: var(--main-color);
 }
 .nav__list-top{
 display: flex;
@@ -136,7 +136,7 @@ row-gap: 10px;
 }
 
 .router-link-exact-active{
- color:#acacac;
+ color:#00be5f;
 }
 
 .pi{

@@ -254,7 +254,7 @@ height: 35px;
 display: flex;
 justify-content: flex-end;
 align-items: center;
-background-color: #2e3743;
+background-color: var(--main-color);
 padding: 10px;
 column-gap: 10px;
 }

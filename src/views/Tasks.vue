@@ -96,7 +96,7 @@ import Basis from '@/components/ui/Basis'
 }
 .task__block-header {
   height: 50px;
-  background-color: #2e3743;
+  background-color: var(--main-color);
   display: flex;
   align-items: center;
   justify-content: center;

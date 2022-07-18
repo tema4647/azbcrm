@@ -8,6 +8,8 @@
 import MainLayout from '@/layouts/MainLayout'
 import RegistrLayout from '@/layouts/RegistrLayout'
 
+
+
 export default {
   computed:{
     layout(){
@@ -23,14 +25,18 @@ export default {
 </script>
 
 <style lang="scss">
+
+@import './assets/variables.css';
+
 *{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 html{
-  
+  width:1920px;
   font-size: 16px;
+  // border: 1px solid red;
 }
 a{
   text-decoration: none;
