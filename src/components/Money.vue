@@ -1,6 +1,6 @@
 <template>
   <div class="money">
-      <Basis >
+      <AppBase>
         <slot></slot>
         <div class="money__wrapper">
           <div class="money__header">
@@ -22,7 +22,6 @@
           <div class="wrapper-field">
             <div class="money__choice-service">
               <div class="field">
-                <MultiSelect v-model="selectedService" :options="SERVICE" optionLabel="service_name"  placeholder="Выберите услугу" />
               </div>
             </div>
   
@@ -33,20 +32,19 @@
           </div>
   
           <div class="money__pay">
-            <Button label="На оплату" class="p-button-success" />
           </div>
         </div>
-      </Basis>
+      </AppBase>
     </div>
 </template>
 
 <script>
-import Basis from "@/components/ui/Basis"
+import AppBase from '@/components/ui/AppBase.vue'
 
   export default {
     name: 'Money',
     components:{
-      Basis
+      AppBase
     },
     data(){
       return{
@@ -58,7 +56,7 @@ import Basis from "@/components/ui/Basis"
 
 <style lang="scss" scoped>
 .money{
-  width:100%;
+  width: 100%;
   margin-top: 20px;
 }
 
@@ -68,13 +66,16 @@ import Basis from "@/components/ui/Basis"
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  // border: 1px solid red;
   
+}
+.money__client-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 .money__header {
 display: flex;
 justify-content: space-between;
-// font-size: 16px;
 }
 .money__history {
   

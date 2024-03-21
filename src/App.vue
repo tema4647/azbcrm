@@ -1,7 +1,7 @@
 <template>
   <component :is="layout">
-  <router-view/>
-</component>
+    <router-view/>
+  </component>
 </template>
 
 <script>
@@ -9,17 +9,18 @@ import MainLayout from '@/layouts/MainLayout'
 import RegistrLayout from '@/layouts/RegistrLayout'
 
 
-
 export default {
+
+  components:{
+    MainLayout,
+    RegistrLayout
+  },
+
   computed:{
     layout(){
       return (this.$route.meta.layout || 'RegistrLayout')
     }
   },
-  components:{
-    MainLayout,
-    RegistrLayout
-  }
   
 }
 </script>
@@ -27,6 +28,10 @@ export default {
 <style lang="scss">
 
 @import './assets/variables.css';
+@import './assets/global.css';
+
+
+
 
 *{
   margin: 0;
@@ -34,7 +39,8 @@ export default {
   box-sizing: border-box;
 }
 html{
-  width:1920px;
+  width: 100%;
+  max-width:1920px;
   font-size: 16px;
   // border: 1px solid red;
 }

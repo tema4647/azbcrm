@@ -1,6 +1,7 @@
 <template>
-<Basis>
-  <div class="tasks">
+<AppBase>
+    <div class="tasks">
+      
     <div class="task__block">
       <div class="task__block-header">
         <div class="block-header__title">Запланировано</div>
@@ -63,15 +64,17 @@
       </div>
     </div>
   </div>
-  </Basis>
+  
+  </AppBase>
 </template>
 
 <script>
-import Basis from '@/components/ui/Basis'
+import AppBase from '@/components/ui/AppBase.vue'
+
   export default {
     name: 'Tasks',
     components:{
-      Basis
+      AppBase
     }
     
   }

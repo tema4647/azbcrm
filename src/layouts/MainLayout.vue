@@ -2,7 +2,7 @@
   <div class="mainLayout">
     <TopBar/>
     <div class="wrapper">
-      <SaidBar/>
+      <MenuBar/>
       <MainContent>
       <router-view/>
       </MainContent>
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import SaidBar from '@/components/SaidBar'
+import MenuBar from '@/components/MenuBar'
 import TopBar from '@/components/TopBar'
 import MainContent from '@/components/MainContent'
 
@@ -19,7 +19,7 @@ import MainContent from '@/components/MainContent'
   export default {
     name:'MainLayout',
     components:{
-      SaidBar,
+      MenuBar,
       TopBar,
       MainContent
     }
@@ -33,6 +33,8 @@ import MainContent from '@/components/MainContent'
 }
 .wrapper{
   display: flex;
+  width: 100%;
+  height: 100%;
 }
 
 

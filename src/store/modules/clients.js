@@ -20,7 +20,7 @@ export default {
   },
   actions:{
     GET_CLIENTS({commit}){
-      return axios('http://127.0.0.1:8000/api/clients')
+      return axios('http://127.0.0.1:8000/api/v1/clients')
       .then((clients)=>{
         commit('SET_CLIENTS', clients.data)
         return clients
@@ -32,9 +32,10 @@ export default {
      },
 
      SET_CLIENTS({commit}, clientSet ){
-      return axios.post('http://127.0.0.1:8000/api/clients', {
+      return axios.post('http://127.0.0.1:8000/api/v1/clients', {
         client_surname: clientSet.client_surname,
-        client_name: clientSet.client_name
+        client_name: clientSet.client_name,
+        group_id: clientSet.group_id
       }
      )
      .then((clients) =>{
@@ -42,11 +43,13 @@ export default {
       }
      )
    },
-   DELETE_CLIENT({commit, state} , clientId){
-    return axios.delete(`http://127.0.0.1:8000/api/clients/${clientId}`)
-    .then(()=>{
-      commit('DELETE_CLIENT', clientId);
-    })
+
+    DELETE_CLIENT({commit, state} , clientId){
+      return axios.delete(`http://127.0.0.1:8000/api/v1/clients/${clientId}`)
+      .then(()=>{
+       commit('DELETE_CLIENT', clientId);
+      }
+    )
   }
 
   },

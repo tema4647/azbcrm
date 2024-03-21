@@ -6,20 +6,24 @@
 
 <script>
   export default {
-    name:"Basis"
-    
+    name:"AppBase"
   }
 </script>
 
 <style lang="scss" scoped>
 
 .basis{
-  min-width: 100px;
-  min-height: 100px;
-  height:100%;
-  background-color: #EDEDED;
+  min-width: 200px;
+  width: 100%;
+  height: 100%;
+  background-color: var(--grey-color);
   border-radius: 5px;
   padding: 10px;
+  overflow: auto;
+}
+
+.basis::-webkit-scrollbar { 
+    width: 0px;  
 }
 
 </style>

@@ -1,112 +1,63 @@
 <template>
   <div class="groups">
 
-    <Toast />
-    <ConfirmDialog acceptLabel="Удалить"> </ConfirmDialog>
-
-    <!-- форма сохранения группы в базу -->
-    <Dialog
-      v-model:visible="display"
-      :style="{ width: '350px' }"
-      header="Добавить группу"
-    >
-      <div class="field">
-        <label for="name">Придумайте название группы</label>
-        <InputText
-          required="true"
-          autofocus
-          autocomplite="none"
-          v-model="groupValue"
-        />
-      </div>
-      <template #footer>
-        <Button
-          label="Отменить"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="hideDialog"
-        />
-        <Button
-          label="Сохранить"
-          icon="pi pi-check"
-          class="p-button-text"
-          @click="saveGroup"
-        />
-      </template>
-    </Dialog>
-
     <!-- тулбар -->
     <Toolbar>
-      <template #start>
-        <Button
-          class="p-button-success"
-          @click="visibleTrue"
-          v-tooltip="'Добавить группу'"
-          icon="pi pi-plus"
-        />
-      </template>
-      <template #end> </template>
+      <AppButton @click="visibleTrue" class="btn-success btn-rounded text-white">Добавить</AppButton>
     </Toolbar>
 
     <!-- таблица с группами -->
-    <DataTable :value="GROUPS" class="dataTable">
-      <Column
-        field="group_name"
-        header="Группа"
-        bodyStyle="text-transform:capitalize;"
-      ></Column>
-      <Column
-        headerStyle="width: 0rem; text-align: center"
-        bodyStyle="text-align: center; overflow: visible"
-      >
-      <template #body="slotProps">
-        <Button
-          @click="confirmDeleteGroup(slotProps.data)"
-          class="p-button-rounded p-button-warning p-button-sm"
-          type="button"
-          icon="pi pi-trash"
-        ></Button>
-      </template>
-      </Column>
-    </DataTable>
+    <DataTable :items="GROUPS" :headers="headers" @click="debug"></DataTable>
+    <!-- <TestTable :columns="columns" :entities="entities" @onEdit="onEdit" @onDelete="onDelete" /> -->
 
-    <!-- форма удаления группы из баззы -->
-    <Dialog
-      v-model:visible="deleteGroupDialog"
-      :style="{ width: '450px' }"
-      header="Подтвердите удаление"
-      :modal="true"
-    >
-      <div class="confirmation-content">
-        <span v-if="group"
-          >Вы уверены что хотите удалить группу <b class="capitalize">{{group}}</b
-          >?</span
-        >
-      </div>
-      <template #footer>
-        <Button
-          label="Отменить"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="deleteGroupDialog = false"
-        />
-        <Button
-          label="Удалить"
-          icon="pi pi-check"
-          class="p-button-text"
-          @click="deleteGroup"
-        />
+
+    <!-- форма сохранения группы в базу -->
+
+    <FormBase class="baseDialogPlace" v-if="display" @closeDialog="hideDialog">
+      <template v-slot:header>
+        Форма добавления группы в базу
       </template>
-    </Dialog>
+      <template v-slot:body>
+        <FormInput v-model="groupValue" lable="Имя" type="text"></FormInput>
+      </template>
+      <template v-slot:footer>
+        <AppButton @click.prevent="saveGroup()" class="btn-rounded btn-success">Сохранить</AppButton>
+      </template>
+    </FormBase>
+
+    <!-- форма удаления группы из базы -->
+
 
   </div>
 </template>
 
 <script>
+import Toolbar from '@/components/Toolbar'
+import FormBase from '@/components/Form/FormBase'
+import FormInput from '@/components/Form/FormInput'
+import DataTable from '@/components/DataTable/DataTable.vue'
+import TestTable from '@/components/DataTable/TestTable.vue'
+import AppButton from '@/components/ui/AppButton.vue'
+
+
+
+
+
+
+
 import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "Groups",
+  components: {
+    Toolbar,
+    FormBase,
+    FormInput,
+    DataTable,
+    TestTable,
+    AppButton
+  },
+
 
   data() {
     return {
@@ -114,11 +65,33 @@ export default {
       groupValue: "",
       deleteGroupDialog: false,
       groupId: "",
-      group:""
+      group: "",
+      // Заголовки столбцов таблицы
+      headers: [
+        {
+          key: 'group_name',
+          label: 'Группа'
+        },
+
+      ],
     };
   },
 
   methods: {
+    // тестовые методы таблицы
+    onEdit(entity) {
+      console.log('edit event: ', entity);
+    },
+    onDelete(entity) {
+      console.log('delete event: ', entity);
+    },
+    // тестовые методы 
+
+
+    debug() {
+      console.log(1)
+    },
+
     visibleTrue() {
       this.display = true;
     },
@@ -134,14 +107,14 @@ export default {
         this.groupValue = "";
       }
     },
-    
+
     // подтверждение удаления группы из базы
     confirmDeleteGroup(group) {
       this.groupId = group.id
       this.group = group.group_name;
       this.deleteGroupDialog = true;
     },
-    
+
     // удаление группы из базы
     deleteGroup() {
       this.$store.dispatch("DELETE_GROUP", this.groupId);
@@ -163,6 +136,7 @@ export default {
   mounted() {
     this.GET_GROUPS();
   },
+
 };
 </script>
 
@@ -172,10 +146,12 @@ export default {
   flex-direction: column;
   row-gap: 5px;
 }
+
 .dataTable {
   margin-top: 15px;
 }
-.capitalize{
-  text-transform:capitalize;
+
+.capitalize {
+  text-transform: capitalize;
 }
 </style>
