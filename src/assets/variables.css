@@ -7,30 +7,5 @@
   --icon-hover: #a1e424;
 }
 
-.btn-success{
-  background-color: #16a34a;
-}
-.btn-primary{
-  background-color: #2563eb;
-}
-.btn-danger{
-  background-color: #dc2626;
-}
-.btn-empty{
-  border: 2px solid rgb(24, 174, 233);
-}
 
-.text-white{
-  color: white;
-}
-
-
-/* button border */
-.btn-round{
-  border-radius: 100%;
-}
-
-.btn-rounded{
-  border-radius: 5%;
-}
 

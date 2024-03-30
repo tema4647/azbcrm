@@ -23,12 +23,9 @@ import AppBase from '@/components/ui/AppBase.vue'
 <style lang="scss" scoped>
 .toolbar{
   width: 100%;
-  height: 50px;
-  margin-bottom: 5px;
 }
 .wrapper-button{
   width: 100%;
-  height: 100%;
   display: flex;
 }
 

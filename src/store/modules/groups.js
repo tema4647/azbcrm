@@ -11,7 +11,7 @@ export default {
     },
     
     ADD_GROUP:(state, group_name)=>{
-      state.groups.push(group_name);
+      state.groups.unshift(group_name);
     },
     DELETE_GROUP:(state, groupId)=>{
       const index = state.groups.findIndex(group => group.id == groupId);

@@ -1,17 +1,10 @@
 <template>
-    <div class="overScreen" @click="handlerClick"></div>
+    <div class="overScreen"></div>
 </template>
 
 <script>
     export default {
         name:'OverScreen',
-
-        methods:{
-            handlerClick(){
-              this.$emit('clickOverScreen');
-            }
-        }
-        
     }
 </script>
 
@@ -24,8 +17,7 @@ left: 0;
 position: fixed;
 z-index: 10;
 background-color: black;
-opacity: .1;
-
+opacity: .7;
 }
 
 </style>

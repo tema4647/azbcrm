@@ -1,3 +1,31 @@
+.btn-success {
+    background-color: #16a34a;
+}
+.btn-primary {
+    background-color: #2563eb;
+}
+.btn-danger {
+    background-color: #dc2626;
+}
+.btn-empty {
+    background-color: inherit;
+}
+
+.text-white {
+    color: white;
+}
+
+/* button border */
+.btn-round {
+    border-radius: 100%;
+}
+
+.btn-rounded {
+    border-radius: 5px;
+}
+
+/* icon border */
+
 .icon-border {
     width: 30px;
     height: 30px;
@@ -10,13 +38,17 @@
     color: white;
     cursor: pointer;
     background: none;
-  }
-  
-  .icon-border:hover {
+}
+
+.icon-border:hover {
     color: var(--icon-hover);
     transition: 0.3s all;
-  }
+}
 
-  .icon-active {
+.icon-active {
     color: var(--icon-hover);
-  }
+}
+
+.text-danger {
+    color: #dc2626;
+}

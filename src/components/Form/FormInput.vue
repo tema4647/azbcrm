@@ -4,7 +4,8 @@
         <!-- подпись поля input -->
         <div class="formInput__lable">{{ lable }}</div>
         <!-- input  -->
-        <input class="formInput__input" @input="handlerInput"  :value="modelValue" :type="type">
+        <input class="formInput__input" @input="handleInput" :value="modelValue" :type="type"
+            :placeholder="placeholder">
     </div>
 </template>
 
@@ -20,6 +21,9 @@ export default {
         },
         modelValue: {
             type: String
+        },
+        placeholder: {
+            type: String
         }
     },
 
@@ -30,7 +34,7 @@ export default {
     },
 
     methods: {
-        handlerInput(e) {
+        handleInput(e) {
             this.$emit('update:modelValue', e.target.value)
         }
     }
@@ -42,28 +46,30 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 17px;
 }
 
 .formInput__lable {
-    font-size: 16px;
+    font-size: 13px;
+    color: black;
 }
 
 .formInput__input {
     border-radius: 3px;
     border: 1px solid #ced4da;
     outline: none;
-    min-height: 30px;
-    padding: 5px;
+    min-height: 35px;
+    padding: 10px 15px;
     width: 70%;
+    font-size: 12px;
 
     &:hover {
-        border: 1px solid #609af8;
+        border: 1px solid #aaaaaa;
+        transition: .5s;
     }
 
     &:focus {
-        box-shadow: 0px 0px 2px 1px #609af8;
-        border: 1px solid #609af8;
+        border: 1px solid #aaaaaa;
     }
 }
 </style>

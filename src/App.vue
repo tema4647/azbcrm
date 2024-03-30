@@ -56,4 +56,7 @@ a{
   text-align: center;
   color: #616161;
 }
+button{
+  border: none;
+}
 </style>

@@ -1,33 +1,52 @@
 <template>
   <div class="groups">
+    <!-- затемнение при открытии формы -->
+    <transition name="fade">
+      <OverScreen v-if="isOverScreen"></OverScreen>
+    </transition>
 
     <!-- тулбар -->
     <Toolbar>
-      <AppButton @click="visibleTrue" class="btn-success btn-rounded text-white">Добавить</AppButton>
+      <AppButton @click="openSaveDialog" class="btn-success btn-rounded text-white">Добавить</AppButton>
     </Toolbar>
 
     <!-- таблица с группами -->
-    <DataTable :items="GROUPS" :headers="headers" @click="debug"></DataTable>
-    <!-- <TestTable :columns="columns" :entities="entities" @onEdit="onEdit" @onDelete="onDelete" /> -->
+    <DataTable :items="GROUPS" :headers="headers" @deleteGroup="openConfirmationDialog"></DataTable>
 
+    <!-- диалог сохранения группы в базу -->
+    <transition name="fade">
+      <FormBase class="baseDialogPlace" v-if="isSaveDialog" @closeDialog="hideSaveDialog">
+        <template v-slot:header>
+          Добавить группу
+        </template>
+        <template v-slot:body>
+          <FormInput v-model="groupValue" lable="Название группы" type="text" placeholder="Например, Радость">
+          </FormInput>
+        </template>
+        <template v-slot:footer>
+          <AppButton class="btn-rounded btn-success btn-empty" @click="hideSaveDialog">Отменить</AppButton>
+          <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveGroup">Сохранить</AppButton>
+        </template>
+      </FormBase>
+    </transition>
 
-    <!-- форма сохранения группы в базу -->
-
-    <FormBase class="baseDialogPlace" v-if="display" @closeDialog="hideDialog">
-      <template v-slot:header>
-        Форма добавления группы в базу
-      </template>
-      <template v-slot:body>
-        <FormInput v-model="groupValue" lable="Имя" type="text"></FormInput>
-      </template>
-      <template v-slot:footer>
-        <AppButton @click.prevent="saveGroup()" class="btn-rounded btn-success">Сохранить</AppButton>
-      </template>
-    </FormBase>
-
-    <!-- форма удаления группы из базы -->
-
-
+    <!-- диалог удаления группы из базы -->
+    <transition name="fade">
+      <FormBase class="baseDialogPlace" v-if="isDeleteDialog" @closeDialog="hideConfirmationDialog">
+        <template v-slot:header>
+          Удалить группу
+        </template>
+        <template v-slot:body>
+          <p style="font-size: 14px; line-height: 22px;">Вы действительно хотите удалить группу <strong
+              style="font-size: 18px"> "{{ group }}" </strong> и все ее данные? <br>
+            После удаления восстановить их будет невозможно.</p>
+        </template>
+        <template v-slot:footer>
+          <AppButton class="btn-rounded btn-success btn-empty" @click="hideConfirmationDialog">Отменить</AppButton>
+          <AppButton class="btn-rounded btn-danger text-white" @click.prevent="deleteGroup">Удалить</AppButton>
+        </template>
+      </FormBase>
+    </transition>
   </div>
 </template>
 
@@ -38,12 +57,7 @@ import FormInput from '@/components/Form/FormInput'
 import DataTable from '@/components/DataTable/DataTable.vue'
 import TestTable from '@/components/DataTable/TestTable.vue'
 import AppButton from '@/components/ui/AppButton.vue'
-
-
-
-
-
-
+import OverScreen from '@/components/ui/OverScreen.vue'
 
 import { mapGetters, mapActions } from "vuex";
 
@@ -55,76 +69,84 @@ export default {
     FormInput,
     DataTable,
     TestTable,
-    AppButton
+    AppButton,
+    OverScreen
   },
 
 
   data() {
     return {
-      display: false,
+      isSaveDialog: false,
+      isDeleteDialog: false,
+      isOverScreen: false,
       groupValue: "",
-      deleteGroupDialog: false,
       groupId: "",
       group: "",
-      // Заголовки столбцов таблицы
+
+      // заголовки столбцов таблицы
       headers: [
+        {
+          key: 'id',
+          label: 'id'
+        },
+
         {
           key: 'group_name',
           label: 'Группа'
         },
+        {
+          key: 'quantity',
+          label: 'Кол-во'
+        },
 
       ],
+
     };
   },
 
   methods: {
-    // тестовые методы таблицы
-    onEdit(entity) {
-      console.log('edit event: ', entity);
-    },
-    onDelete(entity) {
-      console.log('delete event: ', entity);
-    },
-    // тестовые методы 
 
-
-    debug() {
-      console.log(1)
+    // открытие диалога сохранения группы
+    openSaveDialog() {
+      this.isSaveDialog = true;
+      this.isOverScreen = true;
     },
 
-    visibleTrue() {
-      this.display = true;
-    },
-    hideDialog() {
-      this.display = false;
+    // закрытие диалога сохранения группы
+    hideSaveDialog() {
+      this.isSaveDialog = false;
+      this.isOverScreen = false;
     },
 
     // сохранение группы в базу
     saveGroup() {
       if (this.groupValue !== "") {
         this.$store.dispatch("SET_GROUPS", this.groupValue);
-        this.display = false;
+        this.isSaveDialog = false;
+        this.isOverScreen = false;
         this.groupValue = "";
       }
     },
 
-    // подтверждение удаления группы из базы
-    confirmDeleteGroup(group) {
+    // открытие диалога подтверждение удаления группы 
+    openConfirmationDialog(group) {
       this.groupId = group.id
       this.group = group.group_name;
-      this.deleteGroupDialog = true;
+      this.isDeleteDialog = true;
+      this.isOverScreen = true;
+    },
+
+    // закрытие диалога удаления группы
+    hideConfirmationDialog() {
+      this.isDeleteDialog = false;
+      this.isOverScreen = false;
     },
 
     // удаление группы из базы
     deleteGroup() {
       this.$store.dispatch("DELETE_GROUP", this.groupId);
-      this.$toast.add({
-        severity: "success",
-        summary: "Удачно!",
-        detail: "Группа удалена",
-        life: 3000,
-      });
-      this.deleteGroupDialog = false;
+      this.isDeleteDialog = false;
+      this.isOverScreen = false;
     },
 
     ...mapActions(["GET_GROUPS"]),
@@ -141,17 +163,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.field {
+// анимация
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.groups {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  row-gap: 5px;
-}
-
-.dataTable {
-  margin-top: 15px;
-}
-
-.capitalize {
-  text-transform: capitalize;
+  gap: 5px;
 }
 </style>

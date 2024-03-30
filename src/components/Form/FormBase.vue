@@ -1,21 +1,17 @@
 <!-- Основа формы -->
 <template>
   <div class="FormBase">
-    <div class="FormBase__closeButton" @click="handlerClick"></div>
+    <div class="FormBase__header">
+      <slot name="header"></slot>
+      <div class="FormBase__closeButton" @click="handleClick"></div>
+    </div>
 
-    <div class="FormBase__content">
-      <div class="FormBase__header">
-        <slot name="header"></slot>
-      </div>
+    <div class="FormBase__body">
+      <slot name="body"></slot>
+    </div>
 
-      <div class="FormBase__body">
-        <slot name="body"></slot>
-      </div>
-
-
-      <div class="FormBase__footer">
-        <slot name="footer"></slot>
-      </div>
+    <div class="FormBase__footer">
+      <slot name="footer"></slot>
     </div>
 
   </div>
@@ -31,7 +27,7 @@ export default {
   },
 
   methods: {
-    handlerClick() {
+    handleClick() {
       this.$emit('closeDialog')
     }
   },
@@ -41,15 +37,14 @@ export default {
 
 <style lang="scss" scoped>
 .FormBase {
-  width: 30%;
+  width: 35%;
   background-color: var(--white-color);
   border-radius: 5px;
   box-shadow: var(--shadow);
   z-index: 999;
-  padding: 70px 50px 30px 50px;
   margin: auto;
   position: absolute;
-  left:0;
+  left: 0;
   right: 0;
   top: 0;
   transform: translateY(50%);
@@ -58,36 +53,31 @@ export default {
 .FormBase__closeButton {
   width: 20px;
   height: 20px;
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 20px;
-  height: 20px;
   border: 2px solid #609af8;
   border-radius: 100%;
   cursor: pointer;
 }
 
-.FormBase__content {
+.FormBase__header {
+  font-size: 20px;
+  color: black;
+  font-weight: 500;
   display: flex;
-  flex-direction: column;
-  gap: 50px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
 }
 
-.FormBase__header {
- 
-  font-weight: 500;
-}
 
 .FormBase__body {
-
+  padding: 20px;
+  background-color: rgb(243, 243, 243);
 }
 
 .FormBase__footer {
   display: flex;
   justify-content: end;
   gap: 10px;
-  
+  padding: 16px 20px;
 }
-
 </style>

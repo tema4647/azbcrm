@@ -121,11 +121,6 @@ export default {
   left: 0;
 }
 
-.selectionList__body {
-  width: 100%;
-  height: calc(100% - 40px);
-  overflow: auto;
-}
 
 .selectionList__body::-webkit-scrollbar {
   width: 0;
@@ -141,7 +136,6 @@ export default {
   margin-top: 5px;
   cursor: pointer;
 }
-
 
 
 .item__name {

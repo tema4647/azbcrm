@@ -1,7 +1,9 @@
 <template>
   <div class="clients">
     <!-- затемнение при открытии формы -->
-    <OverScreen @clickOverScreen="closeOverScreen()" v-if="overScreen"></OverScreen>
+    <transition name="fade">
+      <OverScreen @clickOverScreen="closeOverScreen()" v-if="overScreen"></OverScreen>
+    </transition>
 
     <!-- тулбар -->
     <Toolbar>
@@ -16,20 +18,24 @@
 
 
     <!-- форма добавления клиента в базу -->
-    <FormBase v-if="clientSaveDialog" @closeDialog="closeDialog()">
-      <template v-slot:header>
-        Форма добавления клиента в базу
-      </template>
-      <template v-slot:body>
-        <FormInput v-model="clientSet.client_name" lable="Имя" type="text"></FormInput>
-        <FormInput v-model="clientSet.client_surname" lable="Фамилия" type="text"></FormInput>
-        <!-- <FormSelect v-model:select="selectedGroups" lable="Группа" :options="options"></FormSelect> -->
-      </template>
-      <template v-slot:footer>
-        <AppButton class="btn-rounded btn-empty" @click.prevent="closeСlientSaveDialog()">Отменить</AppButton>
-        <AppButton @click.prevent="saveClient()" class="btn-rounded btn-success text-white">Сохранить</AppButton>
-      </template>
-    </FormBase>
+    <transition name="fade">
+      <FormBase v-if="clientSaveDialog" @closeDialog="closeDialog()">
+        <template v-slot:header>
+          Добавить клиента
+        </template>
+        <template v-slot:body>
+          <FormInput v-model="clientSet.client_name" lable="Имя" type="text" placeholder="Например, Василёк">
+          </FormInput>
+          <FormInput v-model="clientSet.client_surname" lable="Фамилия" type="text"></FormInput>
+          <!-- <FormSelect v-model:select="selectedGroups" lable="Группа" :options="options"></FormSelect> -->
+        </template>
+        <template v-slot:footer>
+          <AppButton class="btn-rounded btn-empty" @click.prevent="closeСlientSaveDialog()">Отменить</AppButton>
+          <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveClient()">Сохранить</AppButton>
+        </template>
+      </FormBase>
+    </transition>
+
 
     <!-- форма удаления клиента из базы -->
     <FormBase v-if="clientDeleteDialog" @closeDialog="closeDialog">
@@ -52,6 +58,8 @@ import FormSelect from '@/components/Form/FormSelect'
 import Toolbar from '@/components/Toolbar'
 import OverScreen from '@/components/ui/OverScreen'
 import DataTable from '@/components/DataTable/DataTable'
+import Column from '@/components/DataTable/Column'
+
 import TestTable from '@/components/DataTable/TestTable'
 
 import AppButton from '@/components/ui/AppButton.vue'
@@ -70,7 +78,8 @@ export default {
     FormSelect,
     DataTable,
     AppButton,
-    TestTable
+    TestTable,
+    Column
   },
 
   // data ---------
@@ -110,30 +119,44 @@ export default {
 
       ],
 
+      options: [
+        {
+          id: '1000',
+          code: 'f230fh0g3',
+          name: 'Bamboo Watch',
+          description: 'Product Description',
+          image: 'bamboo-watch.jpg',
+          price: 65,
+          category: 'Accessories',
+          quantity: 24,
+          inventoryStatus: 'INSTOCK',
+          rating: 5
+        }
+      ],
+
       // тестовый json
       columns: [
-                {
-                    key: "id",
-                    label: "Id"
-                },
-                {
-                    key: "name",
-                    label: "Name"
-                },
-                {
-                    key: "description",
-                    label: "Description"
-                },
-                {
-                    key: "price",
-                    label: "Price"
-                }
-            ],
-            entities: [
-                { id: '01', name: 'Coffee', description: 'Coffee...', price: [{price_name: 'привет'}, {price_name: 'hello'}] },
-                { id: '02', name: 'Chocolate', description: 'Chocolate...', price: [{price_name: 'пока'}] }
-            ]
-      // конец тестовый json
+        {
+          key: "id",
+          label: "Id"
+        },
+        {
+          key: "name",
+          label: "Name"
+        },
+        {
+          key: "description",
+          label: "Description"
+        },
+        {
+          key: "price",
+          label: "Price"
+        }
+      ],
+      entities: [
+        { id: '01', name: 'Coffee', description: 'Coffee...', price: [{ price_name: 'привет' }, { price_name: 'hello' }] },
+        { id: '02', name: 'Chocolate', description: 'Chocolate...', price: [{ price_name: 'пока' }] }
+      ]
 
     };
   },
@@ -260,6 +283,25 @@ export default {
 
 
 <style lang="scss" scoped>
+
+// анимация
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.clients{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 .dialogText {
   margin-bottom: 50px;
 }

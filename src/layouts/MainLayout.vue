@@ -1,10 +1,10 @@
 <template>
   <div class="mainLayout">
-    <TopBar/>
+    <TopBar />
     <div class="wrapper">
-      <MenuBar/>
+      <MenuBar />
       <MainContent>
-      <router-view/>
+        <router-view />
       </MainContent>
     </div>
   </div>
@@ -16,26 +16,25 @@ import TopBar from '@/components/TopBar'
 import MainContent from '@/components/MainContent'
 
 
-  export default {
-    name:'MainLayout',
-    components:{
-      MenuBar,
-      TopBar,
-      MainContent
-    }
+export default {
+  name: 'MainLayout',
+  components: {
+    MenuBar,
+    TopBar,
+    MainContent
   }
+}
 </script>
 
 <style lang="scss" scoped>
-.mainLayout{
+.mainLayout {
   display: flex;
   flex-direction: column;
 }
-.wrapper{
+
+.wrapper {
   display: flex;
   width: 100%;
   height: 100%;
 }
-
-
 </style>
