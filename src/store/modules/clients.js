@@ -10,7 +10,7 @@ export default {
     },
     
     ADD_CLIENT:(state, id)=>{
-      state.clients.push(id);
+      state.clients.unshift(id);
     },
     DELETE_CLIENT:(state, clientId)=>{
       const index = state.clients.findIndex(client => client.id == clientId);

@@ -90,8 +90,8 @@ export default {
   },
 
   methods: {
-    handleGroup(name) {
-      this.$emit('groups', name)
+    handleGroup(item) {
+      this.$emit('select', item)
     },
 
     handleButton(button) {

@@ -2,50 +2,50 @@
   <div class="clients">
     <!-- затемнение при открытии формы -->
     <transition name="fade">
-      <OverScreen @clickOverScreen="closeOverScreen()" v-if="overScreen"></OverScreen>
+      <OverScreen v-if="isOverScreen"></OverScreen>
     </transition>
 
     <!-- тулбар -->
     <Toolbar>
-      <AppButton class="btn-success btn-rounded text-white" @click="openClientSaveDialog()">
+      <AppButton class="btn-success btn-rounded text-white" @click="openSaveDialog">
         Добавить
       </AppButton>
     </Toolbar>
 
     <!-- таблица -->
-    <DataTable :items="CLIENTS" :headers="headers" @click="debug"></DataTable>
-    <!-- <TestTable :columns="columns" :entities="entities"></TestTable> -->
+    <DataTable :items="CLIENTS" :headers="headers" @deleteItem="openConfirmationDialog"></DataTable>
 
-
-    <!-- форма добавления клиента в базу -->
+    <!-- диалог добавления клиента в базу -->
     <transition name="fade">
-      <FormBase v-if="clientSaveDialog" @closeDialog="closeDialog()">
+      <FormBase v-if="isSaveDialog" @closeDialog="closeSaveDialog">
         <template v-slot:header>
           Добавить клиента
         </template>
         <template v-slot:body>
           <FormInput v-model="clientSet.client_name" lable="Имя" type="text" placeholder="Например, Василёк">
           </FormInput>
-          <FormInput v-model="clientSet.client_surname" lable="Фамилия" type="text"></FormInput>
-          <!-- <FormSelect v-model:select="selectedGroups" lable="Группа" :options="options"></FormSelect> -->
+          <FormInput v-model="clientSet.client_surname" lable="Фамилия" type="text" placeholder="Например, Косичкин"></FormInput>
+          <FormSelect v-model:select="selectedGroups" :options="GROUPS" lable="Группа"></FormSelect>
         </template>
         <template v-slot:footer>
-          <AppButton class="btn-rounded btn-empty" @click.prevent="closeСlientSaveDialog()">Отменить</AppButton>
-          <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveClient()">Сохранить</AppButton>
+          <AppButton class="btn-rounded btn-empty" @click.prevent="closeSaveDialog">Отменить</AppButton>
+          <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveClient">Сохранить</AppButton>
         </template>
       </FormBase>
     </transition>
 
-
-    <!-- форма удаления клиента из базы -->
-    <FormBase v-if="clientDeleteDialog" @closeDialog="closeDialog">
+    <!-- диалог удаления клиента из базы -->
+    <FormBase v-if="isDeleteDialog" @closeDialog="closeConfirmationDialog">
+      <template v-slot:header>
+        Удалить клиента
+      </template>
       <template v-slot:body>
         <p class="dialogText">Вы уверены что хотите удалить <strong class="capitalize">{{ client }}</strong> из списка ?
         </p>
       </template>
       <template v-slot:footer>
-        <AppButton @click.prevent="closeСlientDeleteDialog()" class="btn-rounded btn-empty">Отменить</AppButton>
-        <AppButton @click.prevent="deleteClient()" class="btn-rounded btn-success">Удалить</AppButton>
+        <AppButton class="btn-empty" @click.prevent="closeConfirmationDialog">Отменить</AppButton>
+        <AppButton class="btn-rounded btn-danger text-white" @click.prevent="deleteClient">Удалить</AppButton>
       </template>
     </FormBase>
   </div>
@@ -59,9 +59,7 @@ import Toolbar from '@/components/Toolbar'
 import OverScreen from '@/components/ui/OverScreen'
 import DataTable from '@/components/DataTable/DataTable'
 import Column from '@/components/DataTable/Column'
-
 import TestTable from '@/components/DataTable/TestTable'
-
 import AppButton from '@/components/ui/AppButton.vue'
 
 
@@ -82,28 +80,25 @@ export default {
     Column
   },
 
-  // data ---------
   data() {
     return {
-      overScreen: false,
-      clientSaveDialog: false,
-      clientDeleteDialog: false,
+      isSaveDialog: false,
+      isDeleteDialog: false,
+      isOverScreen: false,
       client: null,
       clientId: null,
       selectedGroups: [],
       clientFullName: null,
+
       // данные клиента
       clientSet: {
         client_name: null,
         client_surname: null,
         group_id: null,
       },
+
       // заголовки столбцов таблицы
       headers: [
-        {
-          key: 'id',
-          label: 'id',
-        },
         {
           key: 'client_surname',
           label: 'Фамилия',
@@ -119,50 +114,11 @@ export default {
 
       ],
 
-      options: [
-        {
-          id: '1000',
-          code: 'f230fh0g3',
-          name: 'Bamboo Watch',
-          description: 'Product Description',
-          image: 'bamboo-watch.jpg',
-          price: 65,
-          category: 'Accessories',
-          quantity: 24,
-          inventoryStatus: 'INSTOCK',
-          rating: 5
-        }
-      ],
-
-      // тестовый json
-      columns: [
-        {
-          key: "id",
-          label: "Id"
-        },
-        {
-          key: "name",
-          label: "Name"
-        },
-        {
-          key: "description",
-          label: "Description"
-        },
-        {
-          key: "price",
-          label: "Price"
-        }
-      ],
-      entities: [
-        { id: '01', name: 'Coffee', description: 'Coffee...', price: [{ price_name: 'привет' }, { price_name: 'hello' }] },
-        { id: '02', name: 'Chocolate', description: 'Chocolate...', price: [{ price_name: 'пока' }] }
-      ]
-
     };
   },
 
-  // computed ----------
   computed: {
+
     // вычисляем группу клиента
     getGroupName() {
       for (let client of this.CLIENTS) {
@@ -171,12 +127,14 @@ export default {
         }
       }
     },
+
     getClientFullName() {
       for (let client of this.CLIENTS) {
         return this.clientFullName = client.client_surname + " " + client.client_name;
       }
 
     },
+    
     ...mapGetters([
       'CLIENTS',
       'GROUPS'
@@ -184,35 +142,18 @@ export default {
   },
 
 
-
-  // methods ---------------
   methods: {
 
-    debug() {
-      console.log(this.CLIENTS);
+    // открытие диалога сохранения клиента
+    openSaveDialog() {
+      this.isSaveDialog = true;
+      this.isOverScreen = true;
     },
 
-
-    // закрытие формы по крестику
-    closeDialog() {
-      this.overScreen = false;
-      this.clientDeleteDialog = false;
-      this.clientSaveDialog = false;
-
-    },
-
-    // подтверждение удаления клиента из базы
-    confirmDeleteClient(client) {
-      this.clientId = client.id;
-      this.client = client.client_surname + " " + client.client_name;
-      this.clientDeleteDialog = true
-      this.overScreen = true
-    },
-
-    // удаление клиента
-    deleteClient() {
-      this.$store.dispatch("DELETE_CLIENT", this.clientId);
-      this.deletionDialog = false;
+    // закрытие диалога сохранения клиента
+    closeSaveDialog() {
+      this.isSaveDialog = false;
+      this.isOverScreen = false;
     },
 
     // сохранение клиента в базу
@@ -221,34 +162,30 @@ export default {
       this.clientSet.client_name = '';
       this.clientSet.client_surname = '';
       this.clientSet.group_id = '';
-      this.clientSaveDialog = false;
-      this.overScreen = false;
+      this.isSaveDialog = false;
+      this.isOverScreen = false;
     },
 
-    openClientSaveDialog() {
-      this.clientSaveDialog = true;
-      this.overScreen = true;
-    },
-    // закрытие окон при клике по затемнению
-    closeOverScreen() {
-      this.overScreen = false;
-      this.clientSaveDialog = false;
-      this.clientDeleteDialog = false;
+    // открытие диалога подтверждения удаления клиента
+    openConfirmationDialog(client) {
+      this.clientId = client.id;
+      this.client = client.client_surname + " " + client.client_name;
+      this.isDeleteDialog = true
+      this.isOverScreen = true
     },
 
-    // отмена удаления клиента из базы
-    closeСlientDeleteDialog() {
-      this.overScreen = false;
-      this.clientDeleteDialog = false;
+    // закрытие диалога подтверждения удаления клиента
+    closeConfirmationDialog() {
+      this.isOverScreen = false;
+      this.isDeleteDialog = false;
     },
 
-    // отмена сохранения клиента в базу
-    closeСlientSaveDialog() {
-      this.overScreen = false;
-      this.clientSaveDialog = false;
+    // удаление клиента
+    deleteClient() {
+      this.$store.dispatch("DELETE_CLIENT", this.clientId);
+      this.isDeleteDialog = false;
+      this.isOverScreen = false;
     },
-
-
 
     ...mapActions([
       'GET_CLIENTS',
@@ -256,34 +193,23 @@ export default {
     ])
   },
 
-  // watch ----------------
   watch: {
     selectedGroups() {
       this.clientSet.group_id = this.selectedGroups.id
     }
   },
 
-
-
-  created() {
-  },
-
   mounted() {
     this.GET_CLIENTS();
     this.GET_GROUPS();
-
   },
 
-  updated() {
-
-  },
 };
 </script>
 
 
 
 <style lang="scss" scoped>
-
 // анимация
 .fade-enter-active,
 .fade-leave-active {
@@ -295,7 +221,7 @@ export default {
   opacity: 0;
 }
 
-.clients{
+.clients {
   height: 100%;
   display: flex;
   flex-direction: column;

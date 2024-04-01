@@ -48,7 +48,7 @@ export default {
     },
     methods: {
         handleClick(item) {
-            this.$emit('deleteGroup', item)
+            this.$emit('deleteItem', item)
         }
     },
 

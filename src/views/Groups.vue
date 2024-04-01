@@ -11,11 +11,11 @@
     </Toolbar>
 
     <!-- таблица с группами -->
-    <DataTable :items="GROUPS" :headers="headers" @deleteGroup="openConfirmationDialog"></DataTable>
+    <DataTable :items="GROUPS" :headers="headers" @deleteItem="openConfirmationDialog"></DataTable>
 
     <!-- диалог сохранения группы в базу -->
     <transition name="fade">
-      <FormBase class="baseDialogPlace" v-if="isSaveDialog" @closeDialog="hideSaveDialog">
+      <FormBase class="baseDialogPlace" v-if="isSaveDialog" @closeDialog="closeSaveDialog">
         <template v-slot:header>
           Добавить группу
         </template>
@@ -24,7 +24,7 @@
           </FormInput>
         </template>
         <template v-slot:footer>
-          <AppButton class="btn-rounded btn-success btn-empty" @click="hideSaveDialog">Отменить</AppButton>
+          <AppButton class="btn-rounded btn-success btn-empty" @click="closeSaveDialog">Отменить</AppButton>
           <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveGroup">Сохранить</AppButton>
         </template>
       </FormBase>
@@ -32,7 +32,7 @@
 
     <!-- диалог удаления группы из базы -->
     <transition name="fade">
-      <FormBase class="baseDialogPlace" v-if="isDeleteDialog" @closeDialog="hideConfirmationDialog">
+      <FormBase class="baseDialogPlace" v-if="isDeleteDialog" @closeDialog="closeConfirmationDialog">
         <template v-slot:header>
           Удалить группу
         </template>
@@ -42,7 +42,7 @@
             После удаления восстановить их будет невозможно.</p>
         </template>
         <template v-slot:footer>
-          <AppButton class="btn-rounded btn-success btn-empty" @click="hideConfirmationDialog">Отменить</AppButton>
+          <AppButton class="btn-rounded btn-success btn-empty" @click="closeConfirmationDialog">Отменить</AppButton>
           <AppButton class="btn-rounded btn-danger text-white" @click.prevent="deleteGroup">Удалить</AppButton>
         </template>
       </FormBase>
@@ -86,11 +86,6 @@ export default {
       // заголовки столбцов таблицы
       headers: [
         {
-          key: 'id',
-          label: 'id'
-        },
-
-        {
           key: 'group_name',
           label: 'Группа'
         },
@@ -113,7 +108,7 @@ export default {
     },
 
     // закрытие диалога сохранения группы
-    hideSaveDialog() {
+    closeSaveDialog() {
       this.isSaveDialog = false;
       this.isOverScreen = false;
     },
@@ -128,7 +123,7 @@ export default {
       }
     },
 
-    // открытие диалога подтверждение удаления группы 
+    // открытие диалога подтверждения удаления группы 
     openConfirmationDialog(group) {
       this.groupId = group.id
       this.group = group.group_name;
@@ -137,7 +132,7 @@ export default {
     },
 
     // закрытие диалога удаления группы
-    hideConfirmationDialog() {
+    closeConfirmationDialog() {
       this.isDeleteDialog = false;
       this.isOverScreen = false;
     },

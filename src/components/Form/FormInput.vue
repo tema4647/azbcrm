@@ -4,8 +4,7 @@
         <!-- подпись поля input -->
         <div class="formInput__lable">{{ lable }}</div>
         <!-- input  -->
-        <input class="formInput__input" @input="handleInput" :value="modelValue" :type="type"
-            :placeholder="placeholder">
+        <input class="formInput__input" @input="handleInput" :value="modelValue" :type="type" :placeholder="placeholder">
     </div>
 </template>
 

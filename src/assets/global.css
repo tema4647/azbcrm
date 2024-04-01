@@ -15,6 +15,10 @@
     color: white;
 }
 
+.text-black {
+    color: #616161;
+}
+
 /* button border */
 .btn-round {
     border-radius: 100%;

@@ -1,8 +1,8 @@
 <template>
   <AppBase>
     <div class="mark-table">
-      <div class="mark-table__header">
-        <span class="mark-table__header-group">Дошколята</span>
+      <div class="mark-table__header" @click="filter">
+        <span class="mark-table__header-group">{{ group }}</span>
         <span class="mark-table__heder-month">Декабрь</span>
         <div class="mark-table__header-loc"></div>
       </div>
@@ -18,19 +18,14 @@
       </div>
 
       <div class="mark-table__table">
-        <div v-for="card in cards" :key="card.id" class="longCard">
-          <span class="longCard__title">{{ card.name }}</span>
+        <div v-for="client in filterClients" :key="client.id" class="longCard">
+          <span class="longCard__title">{{ client.client_name + " " + client.client_surname }}</span>
           <ul class="longCard__list">
-            <li 
-            class="longCard__list-item"
-            @dblclick="handlerDblclick" 
-            v-for="cell in quantityDay" 
-            :key="cell.id" 
-            >
+            <li class="longCard__list-item" @dblclick="handleDblclick" v-for="cell in quantityDay" :key="cell.id">
               <span class="listItem__dot-a"></span>
             </li>
           </ul>
-          <div class="moneyTrue" @click="handlerClick"></div>
+          <div class="moneyTrue" @click="handleClick"></div>
         </div>
       </div>
     </div>
@@ -45,25 +40,38 @@ export default {
   components: {
     AppBase
   },
+
   props: {
-    // cards:{
-    //   type: Array,
-    // }
+    group: String,
+    clients: Array
   },
+
   data() {
     return {
       quantityDay: 30,
       cards: 10
     }
   },
+
   methods: {
-    handlerClick() {
+    handleClick() {
       this.$emit("openSidebar")
     },
-    handlerDblclick(e){
+    handleDblclick(e) {
       this.$emit("toggleMark", e.target)
-    }
+    },
 
+  },
+
+  computed:{
+    // фильтр клиентов по группе
+    filterClients() {
+      return this.clients.filter((client) => {
+        for (let group of client.groups) {
+          return group.group_name == this.group
+        }
+      })
+    }
   }
 
 }
@@ -75,30 +83,35 @@ export default {
 .mark-table__header {
   width: 100%;
   margin-bottom: 40px;
+
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-
 }
 
 .mark-table__header-group {
   font-size: 20px;
   font-weight: 500;
+  flex: 0 1 33%;
+  text-align: left;
 
 }
 
 .mark-table__heder-month {
   font-weight: 500;
   font-size: 20px;
-  border-bottom: 1px dashed black;
   cursor: pointer;
   padding: 3px;
-
+  flex: 0 1 auto;
+  text-align: left;
+  border-bottom: 1px dashed black;
 }
+
 
 .mark-table__header-loc {
   cursor: pointer;
+  flex: 0 1 33%;
+  text-align: left;
 
 }
 
@@ -136,20 +149,17 @@ export default {
   top: 0;
   left: 0;
   background-color: red;
-
 }
 
 .longCard__title {
   width: 150px;
   font-size: 14px;
-  font-weight: 600;
-  color: rgb(75, 75, 75);
+  font-weight: 500;
   margin-right: 30px;
   text-align: start;
   overflow: hidden;
   white-space: nowrap;
   cursor: pointer;
-
 }
 
 .longCard__list {
@@ -190,7 +200,7 @@ export default {
 
 }
 
-.listItem__dot-a{
+.listItem__dot-a {
   border-radius: 100%;
   width: 11px;
   height: 11px;

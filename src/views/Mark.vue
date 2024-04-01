@@ -2,15 +2,15 @@
   <div class="mark">
 
     <!-- панель выбора  -->
-    <SelectionList :groups="GROUPS" :individuals="INDIVIDUALS" :trial="TRIAL" @groups="groupsOpen" />
+    <SelectionList :groups="GROUPS" :individuals="INDIVIDUALS" :trial="TRIAL" @select="selectGroup" />
 
     <!-- таблица -->
-    <MarkTable @openSidebar="openSidebar" @toggleMark="toggleMark" />
+    <MarkTable @openSidebar="openSidebar" @toggleMark="toggleMark" :group="group" :clients="CLIENTS" />
 
 
     <!-- <Sidebar /> -->
     <transition name="fade">
-      <Sidebar v-model:visible="visibleSidebar">
+      <Sidebar v-model:visible="isSidebar">
         <Money></Money>
       </Sidebar>
     </transition>
@@ -40,128 +40,9 @@ export default {
   data() {
     return {
       quantityDay: 31,
-      visibleSidebar: false,
-      cards: [
-        {
-          id: 1,
-          name: 'Репетун Макар',
-        },
-        {
-          id: 2,
-          name: 'Хузягулова Арина',
+      isSidebar: false,
+      group: 'Радость',
 
-        },
-        {
-          id: 3,
-          name: 'Мухаметзянова Алина',
-
-        },
-        {
-          id: 4,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 5,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 6,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 7,
-          name: 'Репетун Макар222',
-
-        },
-        {
-          id: 8,
-          name: 'Репетун Макар 333',
-
-        },
-        {
-          id: 9,
-          name: 'Репетун Макар',
-
-        },
-        {
-          id: 10,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 11,
-          name: 'Мухаметзянова Алина',
-
-        },
-        {
-          id: 12,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 13,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 14,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 15,
-          name: 'Репетун Макар222',
-
-        },
-        {
-          id: 16,
-          name: 'Репетун Макар 333',
-
-        },
-        {
-          id: 17,
-          name: 'Репетун Макар',
-
-        },
-        {
-          id: 18,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 19,
-          name: 'Мухаметзянова Алина',
-
-        },
-        {
-          id: 20,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 21,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 22,
-          name: 'Хузягулова Арина',
-
-        },
-        {
-          id: 23,
-          name: 'Репетун Макар222',
-
-        },
-        {
-          id: 24,
-          name: 'Репетун Макар 333',
-
-        },
-      ],
       INDIVIDUALS: [
         { id: 1, group_name: 'egoza' },
         { id: 2, group_name: 'xerox' },
@@ -170,12 +51,12 @@ export default {
       ],
 
       TRIAL: [
-    { id: 1, group_name: '6', border_color: 'red'  },
-    { id: 2, group_name: '7', border_color: 'blue' },
-    { id: 3, group_name: '8', border_color: 'green' },
-    { id: 4, group_name: '9', border_color: 'yellow' },
-  ]
-      
+        { id: 1, group_name: '6', border_color: 'red' },
+        { id: 2, group_name: '7', border_color: 'blue' },
+        { id: 3, group_name: '8', border_color: 'green' },
+        { id: 4, group_name: '9', border_color: 'yellow' },
+      ]
+
     }
   },
 
@@ -183,26 +64,34 @@ export default {
     toggleMark(toggleMark) {
       toggleMark.firstElementChild.classList.toggle('listItem__dot');
     },
-    groupsOpen(groups) {
-      console.log(groups);
+    selectGroup(item) {
+      this.group = item
     },
 
     openSidebar() {
-      this.visibleSidebar = true
+      this.isSidebar = true
     },
 
 
 
-    ...mapActions(["GET_GROUPS"]),
+    ...mapActions([
+      "GET_GROUPS",
+      "GET_CLIENTS"
+    ]),
 
   },
 
   computed: {
-
-    ...mapGetters(["GROUPS"]),
+    ...mapGetters([
+      "GROUPS",
+      "CLIENTS"
+    ]),
   },
+
   mounted() {
     this.GET_GROUPS();
+    this.GET_CLIENTS();
+
   },
 
 }
