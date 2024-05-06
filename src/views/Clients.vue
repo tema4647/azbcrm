@@ -13,21 +13,32 @@
     </Toolbar>
 
     <!-- таблица -->
-    <DataTable :items="CLIENTS" :headers="headers" @deleteItem="openConfirmationDialog"></DataTable>
+    <DataTable :items="clients" :headers="headers" @deleteItem="openConfirmationDialog">
+      <template #header>
+        <Search placeholder="Найти клиента" />
+      </template>
+    </DataTable>
 
     <!-- диалог добавления клиента в базу -->
     <transition name="fade">
       <FormBase v-if="isSaveDialog" @closeDialog="closeSaveDialog">
-        <template v-slot:header>
+        <template #header>
           Добавить клиента
         </template>
-        <template v-slot:body>
-          <FormInput v-model="clientSet.client_name" lable="Имя" type="text" placeholder="Например, Василёк">
-          </FormInput>
-          <FormInput v-model="clientSet.client_surname" lable="Фамилия" type="text" placeholder="Например, Косичкин"></FormInput>
+        <template #body>
+          <FormInput v-model="clientSet.client_child_fio" lable="Фамилия, Имя" type="text"
+            placeholder="Например, Репетун Иван" />
+          <FormInput v-model="clientSet.client_child_birth" lable="Дата рождения" type="date" placeholder="Выбрать" />
+          <FormInput v-model="clientSet.client_parent_fio" lable="Ф.И.О родителя" type="text"
+            placeholder="Например, Репетун Анна" />
+          <FormInput v-model="clientSet.client_parent_phone" lable="Телефон" type="text"
+            placeholder="Например, 89128807879" />
+          <FormInput v-model="clientSet.client_parent_email" lable="Email" type="text"
+            placeholder="Например, tratata@yandex.ru" />
+
           <FormSelect v-model:select="selectedGroups" :options="GROUPS" lable="Группа"></FormSelect>
         </template>
-        <template v-slot:footer>
+        <template #footer>
           <AppButton class="btn-rounded btn-empty" @click.prevent="closeSaveDialog">Отменить</AppButton>
           <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveClient">Сохранить</AppButton>
         </template>
@@ -36,14 +47,14 @@
 
     <!-- диалог удаления клиента из базы -->
     <FormBase v-if="isDeleteDialog" @closeDialog="closeConfirmationDialog">
-      <template v-slot:header>
+      <template #header>
         Удалить клиента
       </template>
-      <template v-slot:body>
+      <template #body>
         <p class="dialogText">Вы уверены что хотите удалить <strong class="capitalize">{{ client }}</strong> из списка ?
         </p>
       </template>
-      <template v-slot:footer>
+      <template #footer>
         <AppButton class="btn-empty" @click.prevent="closeConfirmationDialog">Отменить</AppButton>
         <AppButton class="btn-rounded btn-danger text-white" @click.prevent="deleteClient">Удалить</AppButton>
       </template>
@@ -60,6 +71,7 @@ import OverScreen from '@/components/ui/OverScreen'
 import DataTable from '@/components/DataTable/DataTable'
 import Column from '@/components/DataTable/Column'
 import TestTable from '@/components/DataTable/TestTable'
+import Search from '@/components/DataTable/Search.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 
 
@@ -77,7 +89,8 @@ export default {
     DataTable,
     AppButton,
     TestTable,
-    Column
+    Column,
+    Search
   },
 
   data() {
@@ -87,54 +100,77 @@ export default {
       isOverScreen: false,
       client: null,
       clientId: null,
-      selectedGroups: [],
-      clientFullName: null,
+      selectedGroups: 1,
 
       // данные клиента
       clientSet: {
-        client_name: null,
-        client_surname: null,
+        client_child_fio: null,
+        client_child_birth: null,
+        client_parent_fio: null,
+        client_parent_phone: null,
+        client_parent_email: null,
         group_id: null,
       },
 
       // заголовки столбцов таблицы
       headers: [
         {
-          key: 'client_surname',
-          label: 'Фамилия',
-        },
-        {
-          key: 'client_name',
+          key: 'client_child_fio',
           label: 'Имя',
         },
+
         {
           key: 'group_name',
           label: 'Группа'
         },
 
+        {
+          key: 'client_parent_fio',
+          label: 'Родитель'
+        },
+
+        {
+          key: 'client_parent_phone',
+          label: 'Телефон родителя'
+        },
+
+        {
+          key: 'client_parent_email',
+          label: 'Email родителя'
+        },
+
+        {
+          key: 'client_child_birth',
+          label: 'Дата рождения',
+        },
+
       ],
+
+
 
     };
   },
 
   computed: {
 
-    // вычисляем группу клиента
-    getGroupName() {
-      for (let client of this.CLIENTS) {
-        for (let group of client.groups) {
-          return group.group_name;
-        }
-      }
+    // выпримляем многомерный массив для таблицы
+    clients() {
+      return this.CLIENTS.map(client => {
+        // деструктурируем вложенный массив "client.groups", присваиваем дефолтное значение
+        const [group = {group_name: ''}] = client.groups
+        return {
+            id: client.id,
+            client_child_fio: client.client_child_fio,
+            client_child_birth: client.client_child_birth,
+            client_parent_fio: client.client_parent_fio,
+            client_parent_phone: client.client_parent_phone,
+            client_parent_email: client.client_parent_email,
+            group_name: group.group_name
+          }
+      });
     },
 
-    getClientFullName() {
-      for (let client of this.CLIENTS) {
-        return this.clientFullName = client.client_surname + " " + client.client_name;
-      }
 
-    },
-    
     ...mapGetters([
       'CLIENTS',
       'GROUPS'
@@ -144,6 +180,7 @@ export default {
 
   methods: {
 
+   
     // открытие диалога сохранения клиента
     openSaveDialog() {
       this.isSaveDialog = true;
@@ -159,8 +196,11 @@ export default {
     // сохранение клиента в базу
     saveClient() {
       this.$store.dispatch('SET_CLIENTS', this.clientSet)
-      this.clientSet.client_name = '';
-      this.clientSet.client_surname = '';
+      this.clientSet.client_child_fio = '';
+      this.clientSet.client_child_birth = '';
+      this.clientSet.client_parent_fio = '';
+      this.clientSet.client_parent_phone = '';
+      this.clientSet.client_parent_email = '';
       this.clientSet.group_id = '';
       this.isSaveDialog = false;
       this.isOverScreen = false;
@@ -169,7 +209,7 @@ export default {
     // открытие диалога подтверждения удаления клиента
     openConfirmationDialog(client) {
       this.clientId = client.id;
-      this.client = client.client_surname + " " + client.client_name;
+      this.client = client.client_child_fio;
       this.isDeleteDialog = true
       this.isOverScreen = true
     },
@@ -194,6 +234,7 @@ export default {
   },
 
   watch: {
+    // следим за выбором группы
     selectedGroups() {
       this.clientSet.group_id = this.selectedGroups.id
     }

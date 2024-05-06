@@ -1,7 +1,7 @@
 <template>
   <AppBase>
     <div class="mark-table">
-      <div class="mark-table__header" @click="filter">
+      <div class="mark-table__header">
         <span class="mark-table__header-group">{{ group }}</span>
         <span class="mark-table__heder-month">Декабрь</span>
         <div class="mark-table__header-loc"></div>
@@ -19,15 +19,18 @@
 
       <div class="mark-table__table">
         <div v-for="client in filterClients" :key="client.id" class="longCard">
-          <span class="longCard__title">{{ client.client_name + " " + client.client_surname }}</span>
+          <span class="longCard__title" @click="handleClick2">{{ client.client_child_fio }}</span>
           <ul class="longCard__list">
             <li class="longCard__list-item" @dblclick="handleDblclick" v-for="cell in quantityDay" :key="cell.id">
-              <span class="listItem__dot-a"></span>
+              <span class="listItem__dot-mask"></span>
             </li>
           </ul>
-          <div class="moneyTrue" @click="handleClick"></div>
+          <div class="moneyTrue" @click="handleClick">
+            <font-awesome-icon icon="fa-solid fa-credit-card" size="xs" />
+          </div>
         </div>
       </div>
+
     </div>
   </AppBase>
 </template>
@@ -37,6 +40,7 @@ import AppBase from '@/components/ui/AppBase.vue'
 
 export default {
   name: 'MarkTable',
+
   components: {
     AppBase
   },
@@ -48,6 +52,10 @@ export default {
 
   data() {
     return {
+      mark: {
+        client: '111',
+        isMarked: false
+      },
       quantityDay: 30,
       cards: 10
     }
@@ -55,16 +63,24 @@ export default {
 
   methods: {
     handleClick() {
-      this.$emit("openSidebar")
+      this.$emit("openPaymentDialog")
     },
-    handleDblclick(e) {
-      this.$emit("toggleMark", e.target)
+
+    handleClick2() {
+      this.$emit("openClientData")
+    },
+
+    handleDblclick(event) {
+      this.$emit("toggleMark", {
+        event: event.target,
+        mark: this.mark
+      })
     },
 
   },
 
-  computed:{
-    // фильтр клиентов по группе
+  computed: {
+    // фильтруем клиентов по группе
     filterClients() {
       return this.clients.filter((client) => {
         for (let group of client.groups) {
@@ -184,23 +200,22 @@ export default {
 }
 
 .moneyTrue {
-  width: 20px;
-  height: 20px;
   border-radius: 100%;
   position: absolute;
   right: 5px;
   top: 50%;
   transform: translate(-50%, -50%);
+  border: 2px solid rgb(221, 221, 221);
+  padding: 3px;
 
   display: flex;
   column-gap: 10px;
   align-items: center;
-  background-color: rgb(53, 156, 122);
   cursor: pointer;
 
 }
 
-.listItem__dot-a {
+.listItem__dot-mask {
   border-radius: 100%;
   width: 11px;
   height: 11px;

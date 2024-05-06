@@ -1,15 +1,18 @@
 <template>
-  <div>
-   Settings
+  <div class="settings">
+    <SelectionList></SelectionList>
   </div>
 </template>
 
 <script>
-  export default {
-    name:'Settings'
+import SelectionList from "@/components/SelectionList"
+
+export default {
+  name: 'Settings',
+  components:{
+    SelectionList
   }
+}
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

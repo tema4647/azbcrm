@@ -11,19 +11,23 @@
     </Toolbar>
 
     <!-- таблица с группами -->
-    <DataTable :items="GROUPS" :headers="headers" @deleteItem="openConfirmationDialog"></DataTable>
+    <DataTable :items="GROUPS" :headers="headers" @deleteItem="openConfirmationDialog" >
+      <template #header>
+        <Search placeholder="Найти группу" />
+      </template>
+    </DataTable>
 
     <!-- диалог сохранения группы в базу -->
     <transition name="fade">
       <FormBase class="baseDialogPlace" v-if="isSaveDialog" @closeDialog="closeSaveDialog">
-        <template v-slot:header>
+        <template #header>
           Добавить группу
         </template>
-        <template v-slot:body>
+        <template #body>
           <FormInput v-model="groupValue" lable="Название группы" type="text" placeholder="Например, Радость">
           </FormInput>
         </template>
-        <template v-slot:footer>
+        <template #footer>
           <AppButton class="btn-rounded btn-success btn-empty" @click="closeSaveDialog">Отменить</AppButton>
           <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveGroup">Сохранить</AppButton>
         </template>
@@ -33,15 +37,15 @@
     <!-- диалог удаления группы из базы -->
     <transition name="fade">
       <FormBase class="baseDialogPlace" v-if="isDeleteDialog" @closeDialog="closeConfirmationDialog">
-        <template v-slot:header>
+        <template #header>
           Удалить группу
         </template>
-        <template v-slot:body>
+        <template #body>
           <p style="font-size: 14px; line-height: 22px;">Вы действительно хотите удалить группу <strong
               style="font-size: 18px"> "{{ group }}" </strong> и все ее данные? <br>
             После удаления восстановить их будет невозможно.</p>
         </template>
-        <template v-slot:footer>
+        <template #footer>
           <AppButton class="btn-rounded btn-success btn-empty" @click="closeConfirmationDialog">Отменить</AppButton>
           <AppButton class="btn-rounded btn-danger text-white" @click.prevent="deleteGroup">Удалить</AppButton>
         </template>
@@ -55,6 +59,7 @@ import Toolbar from '@/components/Toolbar'
 import FormBase from '@/components/Form/FormBase'
 import FormInput from '@/components/Form/FormInput'
 import DataTable from '@/components/DataTable/DataTable.vue'
+import Search from '@/components/DataTable/Search.vue'
 import TestTable from '@/components/DataTable/TestTable.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import OverScreen from '@/components/ui/OverScreen.vue'
@@ -70,7 +75,8 @@ export default {
     DataTable,
     TestTable,
     AppButton,
-    OverScreen
+    OverScreen,
+    Search
   },
 
 

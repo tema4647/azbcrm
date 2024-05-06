@@ -39,25 +39,24 @@
             Расписание
           </router-link>
         </li>
-      </ul>
-    </div>
-
-    <div class="saidBar__bottom">
-      <ul class="nav__list-bottom">
-        <li class="list__item-bootom">
-          <router-link class="item__link-bottom" to="/settings">
-            <i class="pi pi-cog"></i>
+        <li class="list__item">
+          <router-link class="item__link" to="/settings">
+            <div class="icon-border">
+              <font-awesome-icon icon="fa-solid fa-gear" size="xs" />
+            </div>
+            Настройки
           </router-link>
         </li>
-        <li class="list__item-bootom">
-          <router-link class="item__link-bottom" to="/analytics">
-            <i class="pi pi-chart-bar"></i>
+        <li class="list__item">
+          <router-link class="item__link" to="/analytics">
+            <div class="icon-border">
+              <font-awesome-icon icon="fa-solid fa-chart-line" size="xs" />
+            </div>
+            Аналитика
           </router-link>
         </li>
       </ul>
-
     </div>
-
   </div>
 </template>
 
@@ -137,7 +136,7 @@ li {
 }
 
 
-.router-link-exact-active> .icon-border {
+.router-link-exact-active>.icon-border {
   color: var(--icon-hover);
   transition: .3s all;
 }

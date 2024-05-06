@@ -1,0 +1,52 @@
+<template>
+    <div class="search">
+        <input class="search__input" type="search"  :placeholder=placeholder>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'search',
+    props: {
+        placeholder: ''
+    }
+
+}
+</script>
+
+<style lang="scss" scoped>
+.search {
+    position: relative;
+    // border: 1px solid red;
+}
+
+.search::before {
+    content: " ";
+    background-image: url(../../assets/img/icon/search.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: absolute;
+    width: 17px;
+    height: 17px;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    z-index: 100;
+    opacity: .3;
+
+}
+
+.search__input {
+    width: 300px;
+    outline: none;
+    min-height: 35px;
+    border: 2px solid rgb(230, 230, 230);
+    border-radius: 5px;
+    padding: 5px;
+    padding-left: 45px;
+    // color: rgb(58, 58, 58);
+    font-weight: 500;
+    font-size: 12px;
+    font-family: inherit;
+}
+</style>

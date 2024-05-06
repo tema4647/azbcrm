@@ -1,36 +1,49 @@
 <template>
     <AppBase>
-        <table class="table">
-            <thead class="table__head">
-                <tr class="table__head-row">
-                    <th class="table__head-title" v-for="header in headers" :key="header.key">
-                        {{ header.label }}
-                    </th>
-                </tr>
-            </thead>
+        <div class="table-wrapper">
+            <div class="table-header">
+                <slot name="header"></slot>
+            </div>
+            <div class="table-body">
+                <table class="table">
+                    <thead class="table__head">
+                        <tr class="table__head-row">
+                            <th class="table__head-title" v-for="header in headers" :key="header.key">
+                                {{ header.label }}
+                            </th>
+                        </tr>
+                    </thead>
 
-            <tbody class="table__body">
-                <template v-for="item in items" :key="item.id">
-                    <tr class="table__body-row">
-                        <td class="table__body-cell" v-for="header in headers" :key="header.key">
-                            {{ item[header.key] }}
-                        </td>
-                        <button class="row-delete btn-round btn-danger" @click="handleClick(item)"></button>
-                    </tr>
-                </template>
-            </tbody>
-        </table>
+                    <tbody class="table__body">
+                        <template v-for="item in items" :key="item.id">
+                            <tr class="table__body-row">
+                                <td class="table__body-cell" v-for="header in headers" :key="header.key">
+                                    {{ item[header.key] }}
+                                </td>
+                                <button class="row-delete btn-round btn-danger" @click="handleClick(item)"></button>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="table-footer"></div>
+        </div>
+
     </AppBase>
 </template>
 
 <script>
 import AppBase from '@/components/ui/AppBase.vue'
+import Search from '@/components/DataTable/Search.vue'
+
 
 
 export default {
     name: 'DataTable',
     components: {
         AppBase,
+        Search
     },
 
     props: {
@@ -52,11 +65,24 @@ export default {
         }
     },
 
-    computed: {},
+
 }
 </script>
 
 <style lang="scss" scoped>
+.table-header {
+    height: 60px;
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+}
+
 .table {
     width: 100%;
     background-color: white;
@@ -70,10 +96,10 @@ export default {
     width: 100%;
     height: 30px;
     position: sticky;
-    top: 0;
+    top: 60px;
     left: 0;
-    background-color: #f8f9fa;
-
+    background-color: white;
+    z-index: 1;
 }
 
 .table__head-row {

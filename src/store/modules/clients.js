@@ -33,8 +33,11 @@ export default {
 
      SET_CLIENTS({commit}, clientSet ){
       return axios.post('http://127.0.0.1:8000/api/v1/clients', {
-        client_surname: clientSet.client_surname,
-        client_name: clientSet.client_name,
+        client_child_fio: clientSet.client_child_fio,
+        client_child_birth: clientSet.client_child_birth,
+        client_parent_fio: clientSet.client_parent_fio,
+        client_parent_phone: clientSet.client_parent_phone,
+        client_parent_email: clientSet.client_parent_email,
         group_id: clientSet.group_id
       }
      )

@@ -49,7 +49,7 @@ export default {
 }
 
 .formInput__lable {
-    font-size: 13px;
+    font-size: 14px;
     color: black;
 }
 
