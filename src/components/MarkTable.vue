@@ -19,9 +19,9 @@
 
       <div class="mark-table__table">
         <div v-for="client in filterClients" :key="client.id" class="longCard">
-          <span class="longCard__title" @click="handleClick2">{{ client.client_child_fio }}</span>
+          <span class="longCard__title" @click="handleClick2(client)">{{ client.client_child_fio }}</span>
           <ul class="longCard__list">
-            <li class="longCard__list-item" @dblclick="handleDblclick" v-for="cell in quantityDay" :key="cell.id">
+            <li class="longCard__list-item" @dblclick="handleDblclick(client)" v-for="cell in quantityDay" :key="cell.id">
               <span class="listItem__dot-mask"></span>
             </li>
           </ul>
@@ -52,10 +52,6 @@ export default {
 
   data() {
     return {
-      mark: {
-        client: '111',
-        isMarked: false
-      },
       quantityDay: 30,
       cards: 10
     }
@@ -66,15 +62,12 @@ export default {
       this.$emit("openPaymentDialog")
     },
 
-    handleClick2() {
-      this.$emit("openClientData")
+    handleClick2(client) {
+      this.$emit("openClientData", client)
     },
 
-    handleDblclick(event) {
-      this.$emit("toggleMark", {
-        event: event.target,
-        mark: this.mark
-      })
+    handleDblclick(client) {
+      this.$emit("toggleMark", client)
     },
 
   },
@@ -176,6 +169,7 @@ export default {
   overflow: hidden;
   white-space: nowrap;
   cursor: pointer;
+
 }
 
 .longCard__list {

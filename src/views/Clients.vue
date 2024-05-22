@@ -5,16 +5,13 @@
       <OverScreen v-if="isOverScreen"></OverScreen>
     </transition>
 
-    <!-- тулбар -->
-    <Toolbar>
-      <AppButton class="btn-success btn-rounded text-white" @click="openSaveDialog">
-        Добавить
-      </AppButton>
-    </Toolbar>
 
     <!-- таблица -->
-    <DataTable :items="clients" :headers="headers" @deleteItem="openConfirmationDialog">
+    <DataTable :items="clients" :headers="headers" @deleteItem="openConfirmationDialog" @editItem="openEditDialog">
       <template #header>
+        <AppButton class="btn-success btn-rounded text-white" @click="openSaveDialog">
+          Добавить
+        </AppButton>
         <Search placeholder="Найти клиента" />
       </template>
     </DataTable>
@@ -45,6 +42,33 @@
       </FormBase>
     </transition>
 
+    <!-- диалог обновления клиента в базе -->
+    <transition name="fade">
+      <FormBase v-if="isEditDialog" @closeDialog="closeEditDialog">
+        <template #header>
+          Обновить данные клиента
+        </template>
+        <template #body>
+          <FormInput v-model="clientSet.client_child_fio" lable="Фамилия, Имя" type="text"
+            placeholder="Например, Репетун Иван" />
+          <FormInput v-model="clientSet.client_child_birth" lable="Дата рождения" type="date" placeholder="Выбрать" />
+          <FormInput v-model="clientSet.client_parent_fio" lable="Ф.И.О родителя" type="text"
+            placeholder="Например, Репетун Анна" />
+          <FormInput v-model="clientSet.client_parent_phone" lable="Телефон" type="text"
+            placeholder="Например, 89128807879" />
+          <FormInput v-model="clientSet.client_parent_email" lable="Email" type="text"
+            placeholder="Например, tratata@yandex.ru" />
+
+          <FormSelect v-model:select="selectedGroups" :options="GROUPS" lable="Группа"></FormSelect>
+        </template>
+        <template #footer>
+          <AppButton class="btn-rounded btn-empty" @click.prevent="closeEditDialog">Отменить</AppButton>
+          <AppButton class="btn-rounded btn-success text-white" @click.prevent="editClient">Обновить</AppButton>
+        </template>
+      </FormBase>
+    </transition>
+
+
     <!-- диалог удаления клиента из базы -->
     <FormBase v-if="isDeleteDialog" @closeDialog="closeConfirmationDialog">
       <template #header>
@@ -66,11 +90,8 @@
 import FormBase from '@/components/Form/FormBase'
 import FormInput from '@/components/Form/FormInput'
 import FormSelect from '@/components/Form/FormSelect'
-import Toolbar from '@/components/Toolbar'
 import OverScreen from '@/components/ui/OverScreen'
 import DataTable from '@/components/DataTable/DataTable'
-import Column from '@/components/DataTable/Column'
-import TestTable from '@/components/DataTable/TestTable'
 import Search from '@/components/DataTable/Search.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 
@@ -82,20 +103,18 @@ export default {
   name: "Clients",
   components: {
     FormBase,
-    Toolbar,
     OverScreen,
     FormInput,
     FormSelect,
     DataTable,
     AppButton,
-    TestTable,
-    Column,
     Search
   },
 
   data() {
     return {
       isSaveDialog: false,
+      isEditDialog: false,
       isDeleteDialog: false,
       isOverScreen: false,
       client: null,
@@ -104,11 +123,12 @@ export default {
 
       // данные клиента
       clientSet: {
-        client_child_fio: null,
+        client_child_fio: '',
         client_child_birth: null,
-        client_parent_fio: null,
+        client_parent_fio: '',
         client_parent_phone: null,
-        client_parent_email: null,
+        client_parent_email: '',
+        client_parent_amount: 0.00,
         group_id: null,
       },
 
@@ -157,16 +177,18 @@ export default {
     clients() {
       return this.CLIENTS.map(client => {
         // деструктурируем вложенный массив "client.groups", присваиваем дефолтное значение
-        const [group = {group_name: ''}] = client.groups
+        const [group = { group_name: '' }] = client.groups
         return {
-            id: client.id,
-            client_child_fio: client.client_child_fio,
-            client_child_birth: client.client_child_birth,
-            client_parent_fio: client.client_parent_fio,
-            client_parent_phone: client.client_parent_phone,
-            client_parent_email: client.client_parent_email,
-            group_name: group.group_name
-          }
+          id: client.id,
+          client_child_fio: client.client_child_fio,
+          client_child_birth: client.client_child_birth,
+          client_parent_fio: client.client_parent_fio,
+          client_parent_phone: client.client_parent_phone,
+          client_parent_email: client.client_parent_email,
+          client_parent_amount: client.client_parent_amount,
+          group_name: group.group_name,
+          group_id: group.id
+        }
       });
     },
 
@@ -180,7 +202,7 @@ export default {
 
   methods: {
 
-   
+
     // открытие диалога сохранения клиента
     openSaveDialog() {
       this.isSaveDialog = true;
@@ -206,6 +228,45 @@ export default {
       this.isOverScreen = false;
     },
 
+    // открытие диалога обновления клиента
+    openEditDialog(client){
+      this.clientId = client.id;
+      this.clientSet.client_child_fio = client.client_child_fio;
+      this.clientSet.client_child_birth = client.client_child_birth;
+      this.clientSet.client_parent_fio = client.client_parent_fio;
+      this.clientSet.client_parent_phone = client.client_parent_phone;
+      this.clientSet.client_parent_email = client.client_parent_email;
+      this.clientSet.group_id = client.group_id;
+      this.isEditDialog = true;
+      this.isOverScreen = true;
+
+    },
+
+    // закрытие диалога сохранения клиента
+    closeEditDialog() {
+      this.clientSet.client_child_fio = '';
+      this.clientSet.client_child_birth = '';
+      this.clientSet.client_parent_fio = '';
+      this.clientSet.client_parent_phone = '';
+      this.clientSet.client_parent_email = '';
+      this.clientSet.group_id = '';
+      this.isEditDialog = false;
+      this.isOverScreen = false;
+    },
+
+    // обновление клиента в базе
+    editClient() {
+      this.$store.dispatch('PUT_CLIENT', [this.clientId,  this.clientSet])
+      this.clientSet.client_child_fio = '';
+      this.clientSet.client_child_birth = '';
+      this.clientSet.client_parent_fio = '';
+      this.clientSet.client_parent_phone = '';
+      this.clientSet.client_parent_email = '';
+      this.clientSet.group_id = '';
+      this.isEditDialog = false;
+      this.isOverScreen = false;
+    },
+    
     // открытие диалога подтверждения удаления клиента
     openConfirmationDialog(client) {
       this.clientId = client.id;

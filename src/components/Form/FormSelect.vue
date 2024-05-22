@@ -22,12 +22,13 @@ export default {
         },
         options: {
             type: Array
-        }
+        },
+        
     },
     data() {
         return {
             isContent: false,
-            currentOption: 'Выбирите группу'
+            currentOption: 'Выбрать'
         }
     },
 

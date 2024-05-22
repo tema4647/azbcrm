@@ -44,9 +44,7 @@ export default {
     border-radius: 5px;
     padding: 5px;
     padding-left: 45px;
-    // color: rgb(58, 58, 58);
-    font-weight: 500;
-    font-size: 12px;
+    font-size: 13px;
     font-family: inherit;
 }
 </style>

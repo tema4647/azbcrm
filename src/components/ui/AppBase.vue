@@ -20,6 +20,7 @@
   border-radius: 5px;
   padding: 10px;
   overflow: auto;
+
 }
 
 .basis::-webkit-scrollbar { 

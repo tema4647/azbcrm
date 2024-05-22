@@ -6,15 +6,60 @@
         <div class="clientData__body">
             <div class="clientData__body-part">
                 <div class="part-title">Личная информация</div>
+                <div class="part-item__wrapper">
+                    <div class="part-item">
+                        <div class="part-item__title">Ф.И.О</div>
+                        <div class="part-item__value">{{ client.client_child_fio }}</div>
+                    </div>
+                    <div class="part-item">
+                        <div class="part-item__title">Дата рождения</div>
+                        <div class="part-item__value">{{ client.client_child_birth }}</div>
+                    </div>
+                    <div class="part-item">
+                        <div class="part-item__title">Родитель</div>
+                        <div class="part-item__value">{{ client.client_parent_fio }}</div>
+                    </div>
+                    <div class="part-item">
+                        <div class="part-item__title">Телефон</div>
+                        <div class="part-item__value">{{ client.client_parent_phone }}</div>
+                    </div>
+                    <div class="part-item">
+                        <div class="part-item__title">Email</div>
+                        <div class="part-item__value">{{ client.client_parent_email }}</div>
+                    </div>
+                    <div class="part-item">
+                        <div class="part-item__title">Адрес проживания</div>
+                        <div class="part-item__value">г.Пермь, ул.Сапфирная, 20 - кв.45</div>
+                    </div>
+                </div>
 
             </div>
             <div class="clientData__body-part">
-                <div class="part-title">Услуги школы</div>
+                <div class="part-title">Продукты</div>
+                <div class="part-item__wrapper">
+                    <div class="part-item">
+                        <div class="part-item__title">Состоит в группах</div>
+                        <div class="part-item__value"></div>
+                    </div>
+                    <div class="part-item">
+                        <div class="part-item__title">Абонементы</div>
+                        <div class="part-item__value"></div>
+                    </div>
+                </div>
 
             </div>
             <div class="clientData__body-part">
                 <div class="part-title">Деньги</div>
-
+                <div class="part-item__wrapper">
+                    <div class="part-item">
+                        <div class="part-item__title">Денежные средства</div>
+                        <div class="part-item__value">{{ client.client_parent_amount }} руб.</div>
+                    </div>
+                    <div class="part-item">
+                        <div class="part-item__title">Абонементы на сумму</div>
+                        <div class="part-item__value">7000 руб.</div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -31,7 +76,7 @@ export default {
     components: {
     },
     props: {
-
+        client: Object
     },
     data() {
         return {
@@ -88,7 +133,8 @@ export default {
     width: 100%;
     height: 100%;
     display: flex;
-    padding: 16px 20px;
+    gap: 50px;
+    padding: 16px 70px;
 
 }
 
@@ -101,7 +147,33 @@ export default {
     font-size: 20px;
     text-align: left;
     font-weight: 500;
+    margin-bottom: 30px;
     // border: 1px solid red;
+
+}
+
+.part-item__wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    text-align: left;
+    gap: 15px;
+
+    // border: 1px solid red;
+
+}
+
+.part-item {
+    font-size: 14px;
+    padding-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgb(238, 238, 238);
+
+}
+
+.part-item__value {
+    // font-weight: 500;
 
 }
 

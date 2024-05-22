@@ -84,17 +84,11 @@ export default {
   methods: {
     handleItem(item) {
       this.currentItem = item
-      // console.log(item);
-    },
-
-    defaultCurrentItem() {
-      this.currentItem = this.listItems[0].group_name
     },
 
     handleTab(tab) {
       this.selectedListItems = this[tab.name]
       this.currentTab = tab.name
-      console.log(this.currentTab);
     },
   },
 
@@ -102,7 +96,7 @@ export default {
     
     listItems:{
       handler(listItems) {
-        this.currentItem = listItems[0].group_name
+        this.currentItem = listItems[0]?.group_name
       },
     },
 

@@ -38,6 +38,7 @@ export default {
 <style lang="scss" scoped>
 .FormBase {
   width: 35%;
+  min-width: 500px;
   background-color: var(--white-color);
   border-radius: 5px;
   box-shadow: var(--shadow);

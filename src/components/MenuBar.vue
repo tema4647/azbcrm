@@ -40,19 +40,19 @@
           </router-link>
         </li>
         <li class="list__item">
-          <router-link class="item__link" to="/settings">
-            <div class="icon-border">
-              <font-awesome-icon icon="fa-solid fa-gear" size="xs" />
-            </div>
-            Настройки
-          </router-link>
-        </li>
-        <li class="list__item">
           <router-link class="item__link" to="/analytics">
             <div class="icon-border">
               <font-awesome-icon icon="fa-solid fa-chart-line" size="xs" />
             </div>
             Аналитика
+          </router-link>
+        </li>
+        <li class="list__item">
+          <router-link class="item__link" to="/settings">
+            <div class="icon-border">
+              <font-awesome-icon icon="fa-solid fa-gear" size="xs" />
+            </div>
+            Настройки
           </router-link>
         </li>
       </ul>

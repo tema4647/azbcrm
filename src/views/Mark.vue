@@ -7,7 +7,7 @@
 
     <Teleport to="#app">
       <Transition name="fade">
-        <ClientData v-if="isClientData" @closeClientData="closeClientData" />
+        <ClientData v-if="isClientData" @closeClientData="closeClientData" :client="client" />
       </Transition>
     </Teleport>
 
@@ -15,9 +15,13 @@
     <SelectionList :groups="GROUPS" :trial="TRIAL" :individuals="INDIVIDUALS" :tabs="tabs" @select="selectItem" />
 
     <!-- таблица -->
-    <MarkTable @openPaymentDialog="openPaymentDialog" @openClientData="openClientData" @toggleMark="toggleMark"
-      :group="group" :clients="CLIENTS" />
-
+    <MarkTable 
+      @openPaymentDialog="openPaymentDialog" 
+      @openClientData="openClientData" 
+      @toggleMark="toggleMark"
+      :group="group" 
+      :clients="CLIENTS" 
+    />
 
     <!-- диалог оплаты -->
     <transition name="fade">
@@ -70,6 +74,7 @@ export default {
       isPaymentDialog: false,
       isOverScreen: false,
       quantityDay: 31,
+      client: null,
       group: '',
 
       INDIVIDUALS: [
@@ -111,8 +116,9 @@ export default {
   },
 
   methods: {
-    toggleMark(toggleMark) {
-      toggleMark.event.firstElementChild.classList.toggle('listItem__dot');
+    toggleMark(event) {
+      console.log(event);
+      // toggleMark.event.firstElementChild.classList.toggle('listItem__dot');
     },
 
     selectItem(item) {
@@ -120,9 +126,11 @@ export default {
       // console.log(item);
     },
 
-    openClientData() {
+    openClientData(client) {
       this.isClientData = true
       this.isOverScreen = true
+      this.client = client
+      // console.log(openClientData);
     },
 
     openPaymentDialog() {

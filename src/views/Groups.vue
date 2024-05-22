@@ -5,14 +5,11 @@
       <OverScreen v-if="isOverScreen"></OverScreen>
     </transition>
 
-    <!-- тулбар -->
-    <Toolbar>
-      <AppButton @click="openSaveDialog" class="btn-success btn-rounded text-white">Добавить</AppButton>
-    </Toolbar>
 
     <!-- таблица с группами -->
-    <DataTable :items="GROUPS" :headers="headers" @deleteItem="openConfirmationDialog" >
+    <DataTable :items="GROUPS" :headers="headers" @deleteItem="openConfirmationDialog">
       <template #header>
+        <AppButton @click="openSaveDialog" class="btn-success btn-rounded text-white">Добавить</AppButton>
         <Search placeholder="Найти группу" />
       </template>
     </DataTable>

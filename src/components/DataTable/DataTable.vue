@@ -20,7 +20,14 @@
                                 <td class="table__body-cell" v-for="header in headers" :key="header.key">
                                     {{ item[header.key] }}
                                 </td>
-                                <button class="row-delete btn-round btn-danger" @click="handleClick(item)"></button>
+                                <div class="button-wrapper">
+                                    <button class="row-button" @click="handleClick(item)">
+                                        <font-awesome-icon class="row-icon" icon="pen-to-square" />
+                                    </button>
+                                    <button class="row-button" @click="handleClick2(item)">
+                                        <font-awesome-icon class="row-icon" icon="circle-xmark" />
+                                    </button>
+                                </div>
                             </tr>
                         </template>
                     </tbody>
@@ -46,6 +53,8 @@ export default {
         Search
     },
 
+    emits: ['editItem', 'deleteItem'],
+
     props: {
         items: {
             type: Array,
@@ -59,8 +68,12 @@ export default {
     data() {
         return {}
     },
+
     methods: {
-        handleClick(item) {
+        handleClick(item){
+            this.$emit('editItem', item)
+        },
+        handleClick2(item) {
             this.$emit('deleteItem', item)
         }
     },
@@ -70,6 +83,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.table-wrapper {}
+
 .table-header {
     height: 60px;
     background-color: #f8f9fa;
@@ -78,8 +93,9 @@ export default {
     left: 0;
     z-index: 1;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
+    gap: 20px;
     padding: 10px;
 }
 
@@ -109,9 +125,10 @@ export default {
 
 .table__head-title {
     text-align: left;
-    color: #343a40;
+    color: #334155;
     padding: 15px;
     text-align: left;
+    font-weight: 600;
 
 }
 
@@ -129,15 +146,36 @@ export default {
 .table__body-cell {
     text-align: left;
     padding: 15px;
+    color: #334155;
+
 }
 
-.row-delete {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
+.button-wrapper {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    -webkit-box-shadow: -5px 0px 8px 0px rgba(34, 60, 80, 0.09);
+    -moz-box-shadow: -5px 0px 8px 0px rgba(34, 60, 80, 0.09);
+    box-shadow: -5px 0px 8px 0px rgba(34, 60, 80, 0.09);
+}
+
+
+.row-button {
     width: 17px;
     height: 17px;
     cursor: pointer;
+    background-color: inherit;
+
+}
+
+.row-icon{
+    color: rgb(192, 192, 192);
+    font-size: 18px;
+    transition: .5s;
+}
+
+.row-icon:hover{
+    color: rgb(121, 121, 121);
+    transition: .5s;
 }
 </style>
