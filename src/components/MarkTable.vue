@@ -3,7 +3,13 @@
     <div class="mark-table">
       <div class="mark-table__header">
         <span class="mark-table__header-group">{{ group }}</span>
-        <span class="mark-table__heder-month">Декабрь</span>
+        <div class="date-wrapper">
+          <div class="date__arrow date__arrow-l" @click="monthPrevious"><font-awesome-icon
+              :icon="['fas', 'caret-left']" /></div>
+          <span class="date__month">{{ date.currentMonth }}</span>
+          <div class="date__arrow date__arrow-r" @click="monthNext"><font-awesome-icon :icon="['fas', 'caret-right']" />
+          </div>
+        </div>
         <div class="mark-table__header-loc"></div>
       </div>
 
@@ -11,21 +17,28 @@
       <div class="longCard longCard-numbers">
         <span class="longCard__title"></span>
         <ul class="longCard__list">
-          <li v-for="number in quantityDay" :key="number.id" class="longCard__list-item longCard__list-item-numbers">
-            {{ number }}
+          <li v-for=" day  in date.days" :key="day" class="longCard__list-item longCard__list-item-numbers">
+            {{ day.$D }}
           </li>
         </ul>
       </div>
 
       <div class="mark-table__table">
         <div v-for="client in filterClients" :key="client.id" class="longCard">
+
+          <div class="longCard__info" v-if="client.client_parent_amount < 0" @mouseover="isInfo = true"
+            @mouseout="isInfo = false">
+            <div class="longCard__info-text">{{ client.client_parent_amount }}</div>
+          </div>
+
           <span class="longCard__title" @click="handleClick2(client)">{{ client.client_child_fio }}</span>
           <ul class="longCard__list">
-            <li class="longCard__list-item" @dblclick="handleDblclick(client)" v-for="cell in quantityDay" :key="cell.id">
+            <li class="longCard__list-item" @dblclick="handleDblclick($event, client, cell)"
+              v-for="cell in date.days" :key="cell.id">
               <span class="listItem__dot-mask"></span>
             </li>
           </ul>
-          <div class="moneyTrue" @click="handleClick">
+          <div class="moneyTrue" @click="handleClick(client)">
             <font-awesome-icon icon="fa-solid fa-credit-card" size="xs" />
           </div>
         </div>
@@ -36,6 +49,11 @@
 </template>
 
 <script>
+import dayjs from 'dayjs'
+import dayjs_ru from 'dayjs/locale/ru.js'
+
+dayjs.locale('ru')
+
 import AppBase from '@/components/ui/AppBase.vue'
 
 export default {
@@ -52,27 +70,19 @@ export default {
 
   data() {
     return {
-      quantityDay: 30,
-      cards: 10
+      isInfo: false,
+      cards: 10,
+      date: {
+        currentDate: dayjs(),
+        currentMonth: dayjs().format('MMMM YYYY'),
+        daysInMonth: dayjs().daysInMonth(),
+        days: [],
+      },
     }
   },
 
-  methods: {
-    handleClick() {
-      this.$emit("openPaymentDialog")
-    },
-
-    handleClick2(client) {
-      this.$emit("openClientData", client)
-    },
-
-    handleDblclick(client) {
-      this.$emit("toggleMark", client)
-    },
-
-  },
-
   computed: {
+
     // фильтруем клиентов по группе
     filterClients() {
       return this.clients.filter((client) => {
@@ -81,6 +91,62 @@ export default {
         }
       })
     }
+  },
+
+  methods: {
+
+    monthNext() {
+      this.date.currentDate = dayjs(this.date.currentDate).add(1, 'month')
+      this.date.currentMonth = this.date.currentDate.format('MMMM YY')
+      this.date.daysInMonth = dayjs(this.date.currentDate).daysInMonth()
+
+      this.date.days = []
+      let startOf = dayjs(this.date.currentDate).startOf('month')
+      this.date.days.push(startOf)
+      for (let i = 1; i <= this.date.daysInMonth - 1; i++) {
+        this.date.days.push(startOf.add(1, 'day'))
+        startOf = startOf.add(1, 'day')
+      }
+
+    },
+
+    monthPrevious() {
+      this.date.currentDate = dayjs(this.date.currentDate).subtract(1, 'month')
+      this.date.currentMonth = this.date.currentDate.format('MMMM YY')
+      this.date.daysInMonth = dayjs(this.date.currentDate).daysInMonth()
+
+      this.date.days = []
+      let startOf = dayjs(this.date.currentDate).startOf('month')
+      this.date.days.push(startOf)
+      for (let i = 1; i <= this.date.daysInMonth - 1; i++) {
+        this.date.days.push(startOf.add(1, 'day'))
+        startOf = startOf.add(1, 'day')
+      }
+    },
+
+    handleClick(client) {
+      this.$emit("openPaymentDialog", client)
+    },
+
+    handleClick2(client) {
+      this.$emit("openClientData", client)
+    },
+
+    handleDblclick($event, client, cell) {
+      this.$emit("toggleMark", [$event.target, client, cell])
+    },
+
+  },
+  mounted() {
+    this.$nextTick(function () {
+      //  заполняем массив днями текущего мессяца при загрузке
+      let startOf = dayjs().startOf('month')
+      this.date.days.push(startOf)
+      for (let i = 1; i <= this.date.daysInMonth - 1; i++) {
+        this.date.days.push(startOf.add(1, 'day'))
+        startOf = startOf.add(1, 'day')
+      }
+    })
   }
 
 }
@@ -106,14 +172,28 @@ export default {
 
 }
 
-.mark-table__heder-month {
-  font-weight: 500;
-  font-size: 20px;
+.date-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.date__arrow {
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  // color: rgb(192, 192, 192);
+}
+
+.date__month {
+  font-weight: 500;
+  font-size: 21px;
   padding: 3px;
   flex: 0 1 auto;
   text-align: left;
-  border-bottom: 1px dashed black;
+  text-transform: capitalize;
 }
 
 
@@ -149,20 +229,37 @@ export default {
 
 }
 
-.longCard::after {
-  content: "";
-  display: block;
-  position: absolute;
+.longCard__info {
   width: 10px;
-  height: 100%;
-  top: 0;
+  height: 30px;
+  background-color: rgb(255, 0, 0);
+  position: absolute;
   left: 0;
-  background-color: red;
+  top: 0;
 }
+
+.longCard__info-text {
+  width: 100px;
+  height: 30px;
+  background-color: white;
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  padding: 0px 10px;
+  transition: 1s all;
+  transform: translateX(-100%);
+}
+
+.longCard__info:hover .longCard__info-text {
+  transform: translateX(10px);
+}
+
+
 
 .longCard__title {
   width: 150px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   margin-right: 30px;
   text-align: start;

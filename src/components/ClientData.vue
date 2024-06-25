@@ -53,7 +53,7 @@
                 <div class="part-item__wrapper">
                     <div class="part-item">
                         <div class="part-item__title">Денежные средства</div>
-                        <div class="part-item__value">{{ client.client_parent_amount }} руб.</div>
+                        <div class="part-item__value">{{ new Number(client.client_parent_amount).toFixed() }} руб.</div>
                     </div>
                     <div class="part-item">
                         <div class="part-item__title">Абонементы на сумму</div>
@@ -76,28 +76,16 @@ export default {
     components: {
     },
     props: {
-        client: Object
-    },
-    data() {
-        return {
-
+        client: {
+            type: Object
         }
     },
-    computed: {
-
-    },
+   
     methods: {
         handleClick() {
             this.$emit('closeClientData')
         }
     },
-    watch: {
-
-    },
-
-    mounted() {
-
-    }
 
 }
 </script>

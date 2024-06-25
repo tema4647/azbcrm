@@ -15,13 +15,8 @@
     <SelectionList :groups="GROUPS" :trial="TRIAL" :individuals="INDIVIDUALS" :tabs="tabs" @select="selectItem" />
 
     <!-- таблица -->
-    <MarkTable 
-      @openPaymentDialog="openPaymentDialog" 
-      @openClientData="openClientData" 
-      @toggleMark="toggleMark"
-      :group="group" 
-      :clients="CLIENTS" 
-    />
+    <MarkTable @openPaymentDialog="openPaymentDialog" @openClientData="openClientData" @toggleMark="toggleMark"
+      :group="group" :clients="CLIENTS" />
 
     <!-- диалог оплаты -->
     <transition name="fade">
@@ -30,11 +25,12 @@
           Оплатить услугу
         </template>
         <template v-slot:body>
+          <FormInput v-model="currentClientAmount" lable="Сумма" type="number" placeholder="Введите сумму" />
 
         </template>
         <template v-slot:footer>
           <AppButton class="btn-rounded btn-empty" @click="closePaymentDialog">Отменить</AppButton>
-          <AppButton class="btn-rounded btn-success text-white">Оплатить</AppButton>
+          <AppButton class="btn-rounded btn-success text-white" @click="savePayment">Оплатить</AppButton>
         </template>
       </FormBase>
     </transition>
@@ -50,6 +46,7 @@ import MarkTable from "@/components/MarkTable"
 import SelectionList from "@/components/SelectionList"
 import OverScreen from '@/components/ui/OverScreen'
 import FormBase from '@/components/Form/FormBase'
+import FormInput from '@/components/Form/FormInput'
 import AppButton from '@/components/ui/AppButton.vue'
 import ClientData from '@/components/ClientData.vue'
 
@@ -65,7 +62,8 @@ export default {
     OverScreen,
     FormBase,
     AppButton,
-    ClientData
+    ClientData,
+    FormInput
   },
 
   data() {
@@ -76,6 +74,22 @@ export default {
       quantityDay: 31,
       client: null,
       group: '',
+      price: 500.00,
+      currentClientAmount: 0.00,
+      currentClientDeposit: 0.00,
+
+      clientId: null,
+
+      // данные клиента
+      clientSet: {
+        client_child_fio: '',
+        client_child_birth: null,
+        client_parent_fio: '',
+        client_parent_phone: null,
+        client_parent_email: '',
+        client_parent_amount: 0.00,
+        group_id: null,
+      },
 
       INDIVIDUALS: [
         { id: 1, group_name: 'egoza' },
@@ -115,34 +129,100 @@ export default {
 
   },
 
+  computed: {
+    currentSumm() {
+      const result = +this.currentClientDeposit + +this.currentClientAmount
+      return result
+    },
+    ...mapGetters([
+      "GROUPS",
+      "CLIENTS"
+    ]),
+  },
+
   methods: {
-    toggleMark(event) {
-      console.log(event);
-      // toggleMark.event.firstElementChild.classList.toggle('listItem__dot');
+    // отметка посешения и списания денег со счета
+    toggleMark([e, toggleMark, cell]) {
+      const result = toggleMark.client_parent_amount - this.price;
+
+      this.clientId = toggleMark.id;
+      this.clientSet.client_child_fio = toggleMark.client_child_fio;
+      this.clientSet.client_child_birth = toggleMark.client_child_birth;
+      this.clientSet.client_parent_fio = toggleMark.client_parent_fio;
+      this.clientSet.client_parent_phone = toggleMark.client_parent_phone;
+      this.clientSet.client_parent_email = toggleMark.client_parent_email;
+      this.clientSet.client_parent_amount = result;
+      const [group] = toggleMark.groups;
+      this.clientSet.group_id = group.id;
+
+
+      this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientSet])
+      this.clientSet.client_child_fio = '';
+      this.clientSet.client_child_birth = '';
+      this.clientSet.client_parent_fio = '';
+      this.clientSet.client_parent_phone = '';
+      this.clientSet.client_parent_email = '';
+      this.clientSet.group_id = '';
+
+      e.firstElementChild.classList.toggle('listItem__dot');
+      console.log(cell);
     },
 
+    // определение группы в "SelectionList"
     selectItem(item) {
       this.group = item
-      // console.log(item);
     },
 
-    openClientData(client) {
-      this.isClientData = true
-      this.isOverScreen = true
-      this.client = client
-      // console.log(openClientData);
-    },
 
-    openPaymentDialog() {
+    // открытие диалога оплаты
+    openPaymentDialog(client) {
+      this.clientId = client.id;
+      this.clientSet.client_child_fio = client.client_child_fio;
+      this.clientSet.client_child_birth = client.client_child_birth;
+      this.clientSet.client_parent_fio = client.client_parent_fio;
+      this.clientSet.client_parent_phone = client.client_parent_phone;
+      this.clientSet.client_parent_email = client.client_parent_email;
+      this.clientSet.client_parent_amount = client.client_parent_amount;
+      const [group] = client.groups;
+      this.clientSet.group_id = group.id;
+      this.currentClientDeposit = client.client_parent_amount;
+      console.log(this.currentClientDeposit);
+
       this.isPaymentDialog = true
       this.isOverScreen = true
     },
-
+    // закрытие диалога оплаты
     closePaymentDialog() {
       this.isPaymentDialog = false
       this.isOverScreen = false
     },
 
+    savePayment() {
+      this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientSet])
+      this.clientSet.client_child_fio = '';
+      this.clientSet.client_child_birth = '';
+      this.clientSet.client_parent_fio = '';
+      this.clientSet.client_parent_phone = '';
+      this.clientSet.client_parent_email = '';
+      this.clientSet.group_id = '';
+
+      this.currentClientAmount = 0.00;
+      this.currentClientDeposit = 0.00;
+
+      this.isPaymentDialog = false
+      this.isOverScreen = false
+
+      console.log(this.currentSumm);
+    },
+
+
+    // открытие карточки клиента
+    openClientData(client) {
+      this.isClientData = true
+      this.isOverScreen = true
+      this.client = client
+    },
+    // закрытие карточки клиента
     closeClientData() {
       this.isClientData = false
       this.isOverScreen = false
@@ -155,12 +235,14 @@ export default {
 
   },
 
-  computed: {
-    ...mapGetters([
-      "GROUPS",
-      "CLIENTS"
-    ]),
+  watch: {
+    currentSumm() {
+      // следим за изменением текушей суммы и добовляем в clientSet
+      this.clientSet.client_parent_amount = this.currentSumm
+      // console.log(this.currentSumm);
+    }
   },
+
 
   mounted() {
     this.GET_GROUPS();

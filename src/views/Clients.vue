@@ -119,7 +119,7 @@ export default {
       isOverScreen: false,
       client: null,
       clientId: null,
-      selectedGroups: 1,
+      selectedGroups: null,
 
       // данные клиента
       clientSet: {
@@ -218,6 +218,7 @@ export default {
     // сохранение клиента в базу
     saveClient() {
       this.$store.dispatch('SET_CLIENTS', this.clientSet)
+      this.selectedGroups = null;
       this.clientSet.client_child_fio = '';
       this.clientSet.client_child_birth = '';
       this.clientSet.client_parent_fio = '';
@@ -236,6 +237,7 @@ export default {
       this.clientSet.client_parent_fio = client.client_parent_fio;
       this.clientSet.client_parent_phone = client.client_parent_phone;
       this.clientSet.client_parent_email = client.client_parent_email;
+      this.clientSet.client_parent_amount = client.client_parent_amount;
       this.clientSet.group_id = client.group_id;
       this.isEditDialog = true;
       this.isOverScreen = true;
@@ -257,6 +259,7 @@ export default {
     // обновление клиента в базе
     editClient() {
       this.$store.dispatch('PUT_CLIENT', [this.clientId,  this.clientSet])
+      this.selectedGroups = null;
       this.clientSet.client_child_fio = '';
       this.clientSet.client_child_birth = '';
       this.clientSet.client_parent_fio = '';
@@ -297,7 +300,8 @@ export default {
   watch: {
     // следим за выбором группы
     selectedGroups() {
-      this.clientSet.group_id = this.selectedGroups.id
+      // опциональная цепочка "?" 
+      this.clientSet.group_id = this.selectedGroups?.id
     }
   },
 

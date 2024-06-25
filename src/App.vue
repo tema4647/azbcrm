@@ -54,7 +54,7 @@ a{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #616161;
+  color: #334155;
 }
 button{
   border: none;

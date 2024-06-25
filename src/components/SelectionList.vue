@@ -148,7 +148,7 @@ export default {
 
 
 .item__name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   text-transform: capitalize;
 }

@@ -19,7 +19,7 @@ export default {
             type: String
         },
         modelValue: {
-            type: String
+            type: [String,Number]
         },
         placeholder: {
             type: String
@@ -42,6 +42,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+input[type= "number"]::-webkit-inner-spin-button, input[type= "number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
 .formInput {
     display: flex;
     justify-content: space-between;
