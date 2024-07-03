@@ -15,8 +15,9 @@
     <SelectionList :groups="GROUPS" :trial="TRIAL" :individuals="INDIVIDUALS" :tabs="tabs" @select="selectItem" />
 
     <!-- таблица -->
-    <MarkTable @openPaymentDialog="openPaymentDialog" @openClientData="openClientData" @toggleMark="toggleMark"
-      :group="group" :clients="CLIENTS" />
+    <MarkTable v-if="CLIENTS.length" @openPaymentDialog="openPaymentDialog" @openClientData="openClientData" @toggleMark="toggleMark"
+      :group="group" :clients="CLIENTS" >
+    </MarkTable>
 
     <!-- диалог оплаты -->
     <transition name="fade">
@@ -77,7 +78,6 @@ export default {
       price: 500.00,
       currentClientAmount: 0.00,
       currentClientDeposit: 0.00,
-
       clientId: null,
 
       // данные клиента
@@ -142,17 +142,17 @@ export default {
 
   methods: {
     // отметка посешения и списания денег со счета
-    toggleMark([e, toggleMark, cell]) {
-      const result = toggleMark.client_parent_amount - this.price;
+    toggleMark(client) {
+      const result = client.client_parent_amount - this.price;
 
-      this.clientId = toggleMark.id;
-      this.clientSet.client_child_fio = toggleMark.client_child_fio;
-      this.clientSet.client_child_birth = toggleMark.client_child_birth;
-      this.clientSet.client_parent_fio = toggleMark.client_parent_fio;
-      this.clientSet.client_parent_phone = toggleMark.client_parent_phone;
-      this.clientSet.client_parent_email = toggleMark.client_parent_email;
+      this.clientId = client.id;
+      this.clientSet.client_child_fio = client.client_child_fio;
+      this.clientSet.client_child_birth = client.client_child_birth;
+      this.clientSet.client_parent_fio = client.client_parent_fio;
+      this.clientSet.client_parent_phone = client.client_parent_phone;
+      this.clientSet.client_parent_email = client.client_parent_email;
       this.clientSet.client_parent_amount = result;
-      const [group] = toggleMark.groups;
+      const [group] = client.groups;
       this.clientSet.group_id = group.id;
 
 
@@ -164,8 +164,8 @@ export default {
       this.clientSet.client_parent_email = '';
       this.clientSet.group_id = '';
 
-      e.firstElementChild.classList.toggle('listItem__dot');
-      console.log(cell);
+      console.log(client);
+
     },
 
     // определение группы в "SelectionList"

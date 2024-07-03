@@ -17,8 +17,8 @@
       <div class="longCard longCard-numbers">
         <span class="longCard__title"></span>
         <ul class="longCard__list">
-          <li v-for=" day  in date.days" :key="day" class="longCard__list-item longCard__list-item-numbers">
-            {{ day.$D }}
+          <li class="longCard__list-item longCard__list-item-numbers" v-for="date in allDatesMonth">
+            {{ date.$D }}
           </li>
         </ul>
       </div>
@@ -33,9 +33,9 @@
 
           <span class="longCard__title" @click="handleClick2(client)">{{ client.client_child_fio }}</span>
           <ul class="longCard__list">
-            <li class="longCard__list-item" @dblclick="handleDblclick($event, client, cell)"
-              v-for="cell in date.days" :key="cell.id">
-              <span class="listItem__dot-mask"></span>
+            <li class="longCard__list-item" @dblclick="handleDblclick(client, cell)" v-for="cell in client.days"
+              :key="cell.id">
+              <span class="listItem__dot-mask" :class="{ listItem__dot: cell.isMarked }"></span>
             </li>
           </ul>
           <div class="moneyTrue" @click="handleClick(client)">
@@ -71,57 +71,67 @@ export default {
   data() {
     return {
       isInfo: false,
-      cards: 10,
       date: {
         currentDate: dayjs(),
         currentMonth: dayjs().format('MMMM YYYY'),
         daysInMonth: dayjs().daysInMonth(),
-        days: [],
+        startOf: dayjs().startOf('month'),
       },
     }
   },
 
   computed: {
-
     // фильтруем клиентов по группе
     filterClients() {
-      return this.clients.filter((client) => {
+      return this.clientsWithDays.filter((client) => {
         for (let group of client.groups) {
           return group.group_name == this.group
         }
       })
+    },
+
+    // вычисляем все даты месяца
+    allDatesMonth() {
+      const days = []
+      days.push(this.date.startOf)
+      // добавляем все остальные дни месяца
+      for (let i = 1; i <= this.date.daysInMonth - 1; i++) {
+        days.push(this.date.startOf.add(1, 'day'))
+        this.date.startOf = this.date.startOf.add(1, 'day')
+      }
+      return days
+    },
+
+    // добавляем дни месяца клиенту
+    clientsWithDays() {
+      const clientsWithDays = []
+      for (let client of this.clients) {
+        client.days = []
+        this.allDatesMonth.forEach((day) => {
+          client.days.push({
+            day: day,
+            isMarked: false
+          })
+        })
+        clientsWithDays.push(client)
+      }
+      return clientsWithDays
     }
   },
 
   methods: {
-
     monthNext() {
       this.date.currentDate = dayjs(this.date.currentDate).add(1, 'month')
-      this.date.currentMonth = this.date.currentDate.format('MMMM YY')
+      this.date.currentMonth = this.date.currentDate.format('MMMM YYYY')
       this.date.daysInMonth = dayjs(this.date.currentDate).daysInMonth()
-
-      this.date.days = []
-      let startOf = dayjs(this.date.currentDate).startOf('month')
-      this.date.days.push(startOf)
-      for (let i = 1; i <= this.date.daysInMonth - 1; i++) {
-        this.date.days.push(startOf.add(1, 'day'))
-        startOf = startOf.add(1, 'day')
-      }
-
+      this.date.startOf = dayjs(this.date.currentDate).startOf('month')
     },
 
     monthPrevious() {
       this.date.currentDate = dayjs(this.date.currentDate).subtract(1, 'month')
-      this.date.currentMonth = this.date.currentDate.format('MMMM YY')
+      this.date.currentMonth = this.date.currentDate.format('MMMM YYYY')
       this.date.daysInMonth = dayjs(this.date.currentDate).daysInMonth()
-
-      this.date.days = []
-      let startOf = dayjs(this.date.currentDate).startOf('month')
-      this.date.days.push(startOf)
-      for (let i = 1; i <= this.date.daysInMonth - 1; i++) {
-        this.date.days.push(startOf.add(1, 'day'))
-        startOf = startOf.add(1, 'day')
-      }
+      this.date.startOf = dayjs(this.date.currentDate).startOf('month')
     },
 
     handleClick(client) {
@@ -132,33 +142,20 @@ export default {
       this.$emit("openClientData", client)
     },
 
-    handleDblclick($event, client, cell) {
-      this.$emit("toggleMark", [$event.target, client, cell])
+    handleDblclick(client, cell) {
+      const indexСlient = this.clientsWithDays.indexOf(client)
+      const indexDay = this.clientsWithDays[indexСlient].days.indexOf(cell)
+      this.clientsWithDays[indexСlient].days[indexDay].isMarked = true
+      this.$emit("toggleMark", client)
     },
-
   },
-  mounted() {
-    this.$nextTick(function () {
-      //  заполняем массив днями текущего мессяца при загрузке
-      let startOf = dayjs().startOf('month')
-      this.date.days.push(startOf)
-      for (let i = 1; i <= this.date.daysInMonth - 1; i++) {
-        this.date.days.push(startOf.add(1, 'day'))
-        startOf = startOf.add(1, 'day')
-      }
-    })
-  }
-
 }
 </script>
 
 <style lang="scss" scoped>
-.mark-table {}
-
 .mark-table__header {
   width: 100%;
   margin-bottom: 40px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -169,7 +166,6 @@ export default {
   font-weight: 500;
   flex: 0 1 33%;
   text-align: left;
-
 }
 
 .date-wrapper {
@@ -184,7 +180,6 @@ export default {
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  // color: rgb(192, 192, 192);
 }
 
 .date__month {
@@ -201,19 +196,16 @@ export default {
   cursor: pointer;
   flex: 0 1 33%;
   text-align: left;
-
 }
 
 .mark-table__table {
   width: 100%;
   height: calc(100% - 120px);
   overflow: auto;
-
 }
 
 .mark-table__table::-webkit-scrollbar {
   width: 0;
-
 }
 
 .longCard {
@@ -226,7 +218,6 @@ export default {
   padding: 0px 20px;
   position: relative;
   margin-bottom: 5px;
-
 }
 
 .longCard__info {
@@ -266,12 +257,10 @@ export default {
   overflow: hidden;
   white-space: nowrap;
   cursor: pointer;
-
 }
 
 .longCard__list {
   display: flex;
-
 }
 
 .longCard__list-item {
@@ -282,12 +271,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-
 }
 
 .longCard__list-item:last-child {
   border-right: 1px solid rgb(212, 212, 212);
-
 }
 
 .moneyTrue {
@@ -298,12 +285,10 @@ export default {
   transform: translate(-50%, -50%);
   border: 2px solid rgb(221, 221, 221);
   padding: 3px;
-
   display: flex;
   column-gap: 10px;
   align-items: center;
   cursor: pointer;
-
 }
 
 .listItem__dot-mask {
@@ -315,12 +300,10 @@ export default {
 }
 
 .listItem__dot {
-  // display: block;
   border-radius: 100%;
   width: 11px;
   height: 11px;
   background-color: green;
-
 }
 
 .longCard-numbers {
@@ -329,7 +312,6 @@ export default {
 
 .longCard-numbers::after {
   background-color: #EDEDED;
-
 }
 
 .longCard__list-item-numbers {
@@ -338,11 +320,9 @@ export default {
   font-weight: 600;
   text-align: center;
   height: 30px;
-
 }
 
 .longCard__list-item-numbers:last-child {
   border: none;
-
 }
 </style>
