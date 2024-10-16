@@ -165,9 +165,6 @@ export default {
         },
 
       ],
-
-
-
     };
   },
 
@@ -192,7 +189,6 @@ export default {
       });
     },
 
-
     ...mapGetters([
       'CLIENTS',
       'GROUPS'
@@ -201,7 +197,6 @@ export default {
 
 
   methods: {
-
 
     // открытие диалога сохранения клиента
     openSaveDialog() {

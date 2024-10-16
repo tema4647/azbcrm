@@ -57,7 +57,6 @@ import FormBase from '@/components/Form/FormBase'
 import FormInput from '@/components/Form/FormInput'
 import DataTable from '@/components/DataTable/DataTable.vue'
 import Search from '@/components/DataTable/Search.vue'
-import TestTable from '@/components/DataTable/TestTable.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import OverScreen from '@/components/ui/OverScreen.vue'
 
@@ -70,7 +69,6 @@ export default {
     FormBase,
     FormInput,
     DataTable,
-    TestTable,
     AppButton,
     OverScreen,
     Search
@@ -153,6 +151,7 @@ export default {
   computed: {
     ...mapGetters(["GROUPS"]),
   },
+  
   mounted() {
     this.GET_GROUPS();
   },

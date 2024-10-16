@@ -20,6 +20,7 @@
 <script>
 export default {
   name: 'FormBase',
+  emits: ['closeDialog'],
   data() {
     return {
 

@@ -35,19 +35,31 @@
 
             </div>
             <div class="clientData__body-part">
-                <div class="part-title">Продукты</div>
-                <div class="part-item__wrapper">
-                    <div class="part-item">
-                        <div class="part-item__title">Состоит в группах</div>
-                        <div class="part-item__value"></div>
-                    </div>
-                    <div class="part-item">
-                        <div class="part-item__title">Абонементы</div>
-                        <div class="part-item__value"></div>
+                <div class="clientData__part-wrapper">
+                    <div class="part-title">Продукты</div>
+                    <div class="part-item__wrapper">
+                        <div class="part-item">
+                            <div class="part-item__title">Состоит в группах</div>
+                            <div class="part-item__value"></div>
+                        </div>
+                        <div class="part-item">
+                            <div class="part-item__title">Абонементы</div>
+                            <div class="part-item__value"></div>
+                        </div>
                     </div>
                 </div>
 
+                <div class="clientData__part-wrapper">
+                    <div class="part-title">Посещения</div>
+                    <div class="part-item__wrapper">
+                        <div class="part-item" v-for="visit in client.visits" :key="visit.id">
+                            <div class="part-item__title">{{ visit.visit_date }}</div>
+                            <div class="part-item__value"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             <div class="clientData__body-part">
                 <div class="part-title">Деньги</div>
                 <div class="part-item__wrapper">
@@ -59,6 +71,11 @@
                         <div class="part-item__title">Абонементы на сумму</div>
                         <div class="part-item__value">7000 руб.</div>
                     </div>
+                </div>
+
+                <div class="part-title">Поступления, списания</div>
+                <div class="part-item__wrapper">
+                    
                 </div>
             </div>
 
@@ -80,7 +97,7 @@ export default {
             type: Object
         }
     },
-   
+
     methods: {
         handleClick() {
             this.$emit('closeClientData')
@@ -117,9 +134,8 @@ export default {
 }
 
 .clientData__body {
-    // border: 1px solid red;
     width: 100%;
-    height: 100%;
+    height: 90%;
     display: flex;
     gap: 50px;
     padding: 16px 70px;
@@ -128,14 +144,22 @@ export default {
 
 .clientData__body-part {
     flex: auto;
-    // border: 1px solid red;
+    height: 100%;
+    overflow: hidden;
+
 }
+
+.clientData__part-wrapper {
+    margin-bottom: 30px;
+    // height: 100%;
+}
+
 
 .part-title {
     font-size: 20px;
     text-align: left;
     font-weight: 500;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     // border: 1px solid red;
 
 }
@@ -146,9 +170,15 @@ export default {
     justify-content: start;
     text-align: left;
     gap: 15px;
+    overflow: auto;
+    width: 100%;
+    height: 300px;
 
-    // border: 1px solid red;
 
+}
+
+.part-item__wrapper::-webkit-scrollbar { 
+    width: 0px;  
 }
 
 .part-item {

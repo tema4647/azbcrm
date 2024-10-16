@@ -151,6 +151,10 @@ export default {
 }
 
 .button-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    max-width: 90px;
     display: flex;
     gap: 15px;
     padding: 15px;
@@ -161,8 +165,8 @@ export default {
 
 
 .row-button {
-    width: 17px;
-    height: 17px;
+    // width: 17px;
+    // height: 17px;
     cursor: pointer;
     background-color: inherit;
 

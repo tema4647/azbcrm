@@ -23,27 +23,21 @@
 import AppBase from '@/components/ui/AppBase.vue'
 
 export default {
-  name: 'SelectionList',
+  name: 'SelectionList2',
   components: {
     AppBase,
   },
 
   props: {
-    trial: {
+    system: {
       type: Array,
       default: function () {
         return []
       },
     },
 
-    groups: {
-      type: Array,
-      default: function () {
-        return []
-      },
-    },
 
-    individuals: {
+    business: {
       type: Array,
       default: function () {
         return []
@@ -65,7 +59,7 @@ export default {
     return {
       selectedListItems: null,
       currentItem: null,
-      currentTab: 'groups',
+      currentTab: 'business',
     }
   },
 
@@ -74,7 +68,7 @@ export default {
       if (this.selectedListItems) {
         return this.selectedListItems
       } else {
-        return this.groups
+        return this.business
       }
     },
   },
@@ -91,7 +85,7 @@ export default {
   },
 
   watch: {
-    listItems:{
+    listItems: {
       handler(listItems) {
         this.currentItem = listItems[0]?.group_name
       },

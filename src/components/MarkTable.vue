@@ -33,22 +33,28 @@
 
           <span class="longCard__title" @click="handleClick2(client)">{{ client.client_child_fio }}</span>
           <ul class="longCard__list">
-            <li class="longCard__list-item" @dblclick="handleDblclick(client, cell)" v-for="cell in client.days"
-              :key="cell.id">
+            <li class="longCard__list-item" @click.prevent.right="rightClick(client, cell, $event)" @dblclick="handleDblclick(client, cell)"
+              v-for="cell in client.days" :key="cell.id">
               <span class="listItem__dot-mask" :class="{ listItem__dot: cell.isMarked }"></span>
             </li>
           </ul>
           <div class="moneyTrue" @click="handleClick(client)">
-            <font-awesome-icon icon="fa-solid fa-credit-card" size="xs" />
+            <font-awesome-icon icon="fa-solid fa-credit-card" size="xs"/>
           </div>
         </div>
       </div>
+
+      
 
     </div>
   </AppBase>
 </template>
 
 <script>
+import FormBase from '@/components/Form/FormBase'
+import AppButton from '@/components/ui/AppButton.vue'
+import OverScreen from '@/components/ui/OverScreen.vue'
+
 import dayjs from 'dayjs'
 import dayjs_ru from 'dayjs/locale/ru.js'
 
@@ -60,14 +66,18 @@ export default {
   name: 'MarkTable',
 
   components: {
-    AppBase
+    AppBase,
+    FormBase,
+    AppButton,
+    OverScreen,
   },
 
   props: {
     group: String,
     clients: Array
   },
-
+  
+  emits: ['openPaymentDialog', 'openClientData', 'toggleMark', 'rightClick'],
   data() {
     return {
       isInfo: false,
@@ -81,14 +91,6 @@ export default {
   },
 
   computed: {
-    // фильтруем клиентов по группе
-    filterClients() {
-      return this.clientsWithDays.filter((client) => {
-        for (let group of client.groups) {
-          return group.group_name == this.group
-        }
-      })
-    },
 
     // вычисляем все даты месяца
     allDatesMonth() {
@@ -109,17 +111,36 @@ export default {
         client.days = []
         this.allDatesMonth.forEach((day) => {
           client.days.push({
-            day: day,
+            day: day.format('YYYY-MM-DD'),
             isMarked: false
           })
         })
+        // вычисляем отмеченые дни
+        for (const visit of client.visits) {
+          client.days.map((day) => {
+            if (day.day == visit.visit_date) {
+              day.isMarked = true
+            }
+            return day
+          })
+        }
         clientsWithDays.push(client)
       }
       return clientsWithDays
+    },
+
+    // фильтруем клиентов по группе
+    filterClients() {
+      return this.clientsWithDays.filter((client) => {
+        for (let group of client.groups) {
+          return group.group_name == this.group
+        }
+      })
     }
   },
 
   methods: {
+
     monthNext() {
       this.date.currentDate = dayjs(this.date.currentDate).add(1, 'month')
       this.date.currentMonth = this.date.currentDate.format('MMMM YYYY')
@@ -143,12 +164,15 @@ export default {
     },
 
     handleDblclick(client, cell) {
-      const indexСlient = this.clientsWithDays.indexOf(client)
-      const indexDay = this.clientsWithDays[indexСlient].days.indexOf(cell)
-      this.clientsWithDays[indexСlient].days[indexDay].isMarked = true
-      this.$emit("toggleMark", client)
+      this.$emit("toggleMark", [client, cell])
+    },
+
+    rightClick(client, cell, $event) {
+      this.$emit("rightClick", [client, cell, $event])
     },
   },
+
+
 }
 </script>
 
@@ -271,7 +295,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
+
+
 
 .longCard__list-item:last-child {
   border-right: 1px solid rgb(212, 212, 212);
