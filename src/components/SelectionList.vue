@@ -1,7 +1,7 @@
 <template>
   <AppBase>
-    <div class="selectionList">
-      <div class="selectionList__header">
+    <div class="selectionList" >
+      <div v-if="tabs.length < 2 ? false : true" class="selectionList__header">
         <!-- Класс "icon-border" приходит из global.css -->
         <button class="icon-border" :class="{ 'icon-active': currentTab === tab.name }" v-for="tab in tabs"
           :key="tab.name" @click="handleTab(tab)">
@@ -9,7 +9,7 @@
         </button>
       </div>
 
-      <div class="selectionList__body">
+      <div class="selectionList__body" >
         <div class="selectionList__items" :style='{ borderLeft: `3px solid ${item.border_color}` }'
           v-for="item in listItems" :key="item" @click="handleItem(item.group_name)">
           <span class="item__name">{{ item.group_name }}</span>
@@ -71,15 +71,15 @@ export default {
 
   computed: {
     listItems() {
-      if (this.selectedListItems) {
-        return this.selectedListItems
-      } else {
-        return this.groups
-      }
+      
+      return this.selectedListItems ? this.selectedListItems : this.groups
+
     },
+
   },
 
   methods: {
+
     handleItem(item) {
       this.currentItem = item
     },

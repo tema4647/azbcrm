@@ -1,7 +1,7 @@
 <template>
   <AppBase>
     <div class="selectionList">
-      <div class="selectionList__header">
+      <div v-if="tabs.length < 2 ? false : true" class="selectionList__header">
         <!-- Класс "icon-border" приходит из global.css -->
         <button class="icon-border" :class="{ 'icon-active': currentTab === tab.name }" v-for="tab in tabs"
           :key="tab.name" @click="handleTab(tab)">
@@ -65,11 +65,7 @@ export default {
 
   computed: {
     listItems() {
-      if (this.selectedListItems) {
-        return this.selectedListItems
-      } else {
-        return this.business
-      }
+      return this.selectedListItems ? this.selectedListItems : this.business
     },
   },
 

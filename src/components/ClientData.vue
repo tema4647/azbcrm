@@ -7,27 +7,27 @@
             <div class="clientData__body-part">
                 <div class="part-title">Личная информация</div>
                 <div class="part-item__wrapper">
-                    <div class="part-item">
+                    <div class="part-item border-bottom flex-row space-between">
                         <div class="part-item__title">Ф.И.О</div>
                         <div class="part-item__value">{{ client.client_child_fio }}</div>
                     </div>
-                    <div class="part-item">
+                    <div class="part-item border-bottom flex-row space-between">
                         <div class="part-item__title">Дата рождения</div>
                         <div class="part-item__value">{{ client.client_child_birth }}</div>
                     </div>
-                    <div class="part-item">
+                    <div class="part-item border-bottom flex-row space-between">
                         <div class="part-item__title">Родитель</div>
                         <div class="part-item__value">{{ client.client_parent_fio }}</div>
                     </div>
-                    <div class="part-item">
+                    <div class="part-item border-bottom flex-row space-between">
                         <div class="part-item__title">Телефон</div>
                         <div class="part-item__value">{{ client.client_parent_phone }}</div>
                     </div>
-                    <div class="part-item">
+                    <div class="part-item border-bottom flex-row space-between">
                         <div class="part-item__title">Email</div>
                         <div class="part-item__value">{{ client.client_parent_email }}</div>
                     </div>
-                    <div class="part-item">
+                    <div class="part-item border-bottom flex-row space-between">
                         <div class="part-item__title">Адрес проживания</div>
                         <div class="part-item__value">г.Пермь, ул.Сапфирная, 20 - кв.45</div>
                     </div>
@@ -36,21 +36,28 @@
             </div>
             <div class="clientData__body-part">
                 <div class="clientData__part-wrapper">
-                    <div class="part-title">Продукты</div>
+                    <div class="part-title ">Продукты</div>
                     <div class="part-item__wrapper">
                         <div class="part-item">
-                            <div class="part-item__title">Состоит в группах</div>
-                            <div class="part-item__value"></div>
+                            <div class="part-item__title border-bottom">Состоит в группах</div>
+                            <div class="flex-row tickets" v-for="group in client.groups" :key="group.id"> 
+                                <div class="part-item__value"> {{ group.group_name }}</div>
+                            </div>
                         </div>
-                        <div class="part-item">
-                            <div class="part-item__title">Абонементы</div>
-                            <div class="part-item__value"></div>
+                        <div class="part-item flex-column">
+                            <div class="part-item__title border-bottom">Абонементы</div>
+                            <div class="flex-row tickets" v-for="ticket in client.tickets" :key="ticket.id"> 
+                                <div class="part-item__value"> {{ ticket.ticket_name }}</div>
+                                <div class="part-item__value"> {{ ticket.ticket_cost }}</div>
+                                <div class="part-item__value"> {{ ticket.ticket_discount }}</div>
+                                <div class="part-item__value"> {{ ticket.ticket_visits }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="clientData__part-wrapper">
-                    <div class="part-title">Посещения</div>
+                    <div class="part-title border-bottom">Посещения</div>
                     <div class="part-item__wrapper">
                         <div class="part-item" v-for="visit in client.visits" :key="visit.id">
                             <div class="part-item__title">{{ visit.visit_date }}</div>
@@ -63,19 +70,19 @@
             <div class="clientData__body-part">
                 <div class="part-title">Деньги</div>
                 <div class="part-item__wrapper">
-                    <div class="part-item">
-                        <div class="part-item__title">Денежные средства</div>
+                    <div class="part-item flex-row space-between">
+                        <div class="part-item__title border-bottom">Денежные средства</div>
                         <div class="part-item__value">{{ new Number(client.client_parent_amount).toFixed() }} руб.</div>
                     </div>
-                    <div class="part-item">
-                        <div class="part-item__title">Абонементы на сумму</div>
+                    <div class="part-item flex-row space-between">
+                        <div class="part-item__title border-bottom">Абонементы на сумму</div>
                         <div class="part-item__value">7000 руб.</div>
                     </div>
                 </div>
 
-                <div class="part-title">Поступления, списания</div>
+                <div class="part-title ">Поступления, списания</div>
                 <div class="part-item__wrapper">
-                    
+
                 </div>
             </div>
 
@@ -88,7 +95,9 @@
 
 <script>
 
+
 export default {
+
     name: 'ClientData',
     components: {
     },
@@ -173,27 +182,50 @@ export default {
     overflow: auto;
     width: 100%;
     height: 300px;
-
-
-}
-
-.part-item__wrapper::-webkit-scrollbar { 
-    width: 0px;  
-}
-
-.part-item {
     font-size: 14px;
-    padding-bottom: 5px;
-    display: flex;
-    justify-content: space-between;
+
+
+}
+
+.part-item__wrapper::-webkit-scrollbar {
+    width: 0px;
+}
+
+
+.border-bottom {
     border-bottom: 1px solid rgb(238, 238, 238);
-
+    padding-bottom: 5px;
 }
 
-.part-item__value {
-    // font-weight: 500;
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.space-between{
+    justify-content: space-between;
+}
+
+
+.tickets{
+    background-color: rgb(248, 247, 247);
+    margin-top: 5px ;
+    padding: 5px;
+
+    .part-item__value {
+    width: 90px;
+    overflow: hidden;
+    // border: 1px solid red;
 
 }
+}
+
 
 .clientData__footer {
     width: 100%;

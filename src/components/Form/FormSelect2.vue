@@ -6,7 +6,7 @@
         <div class="formSelect__select" @click="handleClick"> {{ currentOption }}
             <div class="formSelect__content" v-if="isContent">
                 <div class="select-option" @click="selectOption(option)" v-for="option of options" :key="option.id">
-                    {{ option.group_name }}
+                    {{ option.service_name }}
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@ export default {
         },
 
         selectOption(option) {
-            this.currentOption = option.group_name
+            this.currentOption = option.service_name
             this.$emit('update:select', option)
         }
 

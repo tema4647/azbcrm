@@ -6,7 +6,8 @@
 
     <transition name="fade">
       <Popup :style="positionPopup" v-if="isPopup" @click="closePopup">
-        <p class="popup__link" @click="cancelVisit">Отменить посещение {{ visit.visitClient }} {{ visit.visitDate }} </p>
+        <p class="popup__link" @click="cancelVisit">Отменить посещение {{ visit.visitClient }} {{ visit.visitDate }}
+        </p>
       </Popup>
     </transition>
 
@@ -29,7 +30,7 @@
     <transition name="fade">
       <FormBase v-if="isPaymentDialog" @closeDialog="closePaymentDialog">
         <template v-slot:header>
-          {{clientSet.client_child_fio}}  {{ currentClientDeposit }}
+          {{ clientSet.client_child_fio }} {{ currentClientDeposit }}
         </template>
         <template v-slot:body>
           <FormInput v-model="currentClientAmount" lable="Сумма" type="number" placeholder="Введите сумму" />
@@ -93,7 +94,7 @@ export default {
         left: 0,
         top: 0,
       },
-      visit:{
+      visit: {
         visitClient: '',
         visitDate: null,
       },
@@ -157,11 +158,14 @@ export default {
       const result = +this.currentClientDeposit + +this.currentClientAmount
       return result
     },
+
+    
+
     ...mapGetters([
-      "GROUPS",
-      "CLIENTS",
-      "VISITS"
-    ]),
+        "GROUPS",
+        "CLIENTS",
+        "VISITS"
+      ]),
   },
 
   methods: {
@@ -181,7 +185,7 @@ export default {
       this.positionPopup.left = $event.x + 'px'
       this.positionPopup.top = $event.y + 'px'
       console.log(cell);
-      
+
     },
 
     // отметка посешения и списания денег со счета
