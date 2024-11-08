@@ -36,19 +36,30 @@
             </div>
             <div class="clientData__body-part">
                 <div class="clientData__part-wrapper">
-                    <div class="part-title ">Продукты</div>
+                    <div class="part-title ">Услуги</div>
                     <div class="part-item__wrapper">
                         <div class="part-item">
-                            <div class="part-item__title border-bottom">Состоит в группах</div>
-                            <div class="flex-row tickets" v-for="group in client.groups" :key="group.id"> 
+                            <div class="part-item__title border-bottom">Индивидуальные занятия</div>
+                            <div class="flex-row tickets" v-for="individual in client.individuals" :key="individual.id">
+                                <div class="part-item__value"> {{ individual.individual_name }} </div>
+                                <font-awesome-icon icon="fa-solid fa-chevron-right" />
+                                <div class="part-item__value"> {{ individual.services.service_name }}</div>
+                            </div>
+                        </div>
+                        <div class="part-item">
+                            <div class="part-item__title border-bottom">Групповые занятия</div>
+                            <div class="flex-row tickets" v-for="group in client.groups" :key="group.id">
                                 <div class="part-item__value"> {{ group.group_name }}</div>
+                                <font-awesome-icon icon="fa-solid fa-chevron-right" />
+                                <div class="part-item__value"> {{ group.services.service_name }}</div>
                             </div>
                         </div>
                         <div class="part-item flex-column">
                             <div class="part-item__title border-bottom">Абонементы</div>
-                            <div class="flex-row tickets" v-for="ticket in client.tickets" :key="ticket.id"> 
+                            <div class="flex-row tickets" v-for="ticket in client.tickets" :key="ticket.id">
                                 <div class="part-item__value"> {{ ticket.ticket_name }}</div>
                                 <div class="part-item__value"> {{ ticket.ticket_cost }}</div>
+                                <div class="part-item__value"> {{ ticket.visit_cost }}</div>
                                 <div class="part-item__value"> {{ ticket.ticket_discount }}</div>
                                 <div class="part-item__value"> {{ ticket.ticket_visits }}</div>
                             </div>
@@ -67,6 +78,8 @@
                 </div>
             </div>
 
+            
+
             <div class="clientData__body-part">
                 <div class="part-title">Деньги</div>
                 <div class="part-item__wrapper">
@@ -75,7 +88,7 @@
                         <div class="part-item__value">{{ new Number(client.client_parent_amount).toFixed() }} руб.</div>
                     </div>
                     <div class="part-item flex-row space-between">
-                        <div class="part-item__title border-bottom">Абонементы на сумму</div>
+                        <div class="part-item__title border-bottom">Деньги в абонементах</div>
                         <div class="part-item__value">7000 руб.</div>
                     </div>
                 </div>
@@ -88,13 +101,11 @@
 
         </div>
         <div class="clientData__footer">
-
         </div>
     </div>
 </template>
 
 <script>
-
 
 export default {
 
@@ -130,37 +141,41 @@ export default {
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    display: grid;
+    grid-auto-rows: minmax(50px, auto);
+    
 }
 
 .clientData__header {
     padding: 16px 20px;
     display: flex;
     justify-content: end;
-
 }
 
 .clientData__body {
-    width: 100%;
-    height: 90%;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 50px;
+
     padding: 16px 70px;
 
 }
 
+.clientData__footer {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: end;
+}
+
 .clientData__body-part {
-    flex: auto;
+    width: 100%;
     height: 100%;
     overflow: hidden;
-
 }
 
 .clientData__part-wrapper {
+
     margin-bottom: 30px;
-    // height: 100%;
 }
 
 
@@ -169,7 +184,7 @@ export default {
     text-align: left;
     font-weight: 500;
     margin-bottom: 20px;
-    // border: 1px solid red;
+
 
 }
 
@@ -183,7 +198,6 @@ export default {
     width: 100%;
     height: 300px;
     font-size: 14px;
-
 
 }
 
@@ -208,30 +222,27 @@ export default {
     gap: 10px;
 }
 
-.space-between{
+.space-between {
     justify-content: space-between;
 }
 
 
-.tickets{
-    background-color: rgb(248, 247, 247);
-    margin-top: 5px ;
+.tickets {
+    background-color: rgb(248, 248, 247);
+    margin-top: 5px;
     padding: 5px;
 
     .part-item__value {
-    width: 90px;
-    overflow: hidden;
-    // border: 1px solid red;
-
+        width: 70px;
+        overflow: hidden;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 12px;
+    }
 }
-}
 
 
-.clientData__footer {
-    width: 100%;
-    padding: 16px 20px;
 
-}
 
 .clientData__closeButton {
     width: 20px;

@@ -16,17 +16,19 @@
 
     <!-- диалог сохранения группы в базу -->
     <transition name="fade">
-      <FormBase class="baseDialogPlace" v-if="isSaveDialog" @closeDialog="closeSaveDialog">
+      <FormBase  class="baseDialogPlace" v-if="isSaveDialog" @closeDialog="closeSaveDialog">
         <template #header>
           Добавить группу
         </template>
         <template #body>
-          <FormInput v-model="groupValue" lable="Название группы" type="text" placeholder="Например, Радость">
-          </FormInput>
+          <FormInput v-model="groupList.groupName" lable="Название группы" type="text"
+            placeholder="Например, Радость" />
+          <FormSelect v-model:select="selectedServices" :options="SERVICES" optionFieldName="service_name" lable="Услуга" />
         </template>
         <template #footer>
           <AppButton class="btn-rounded btn-success btn-empty" @click="closeSaveDialog">Отменить</AppButton>
-          <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveGroup">Сохранить</AppButton>
+          <AppButton :disabled="groupList.groupName && groupList.serviceId ? false : true"
+            class="btn-rounded btn-success text-white" @click.prevent="saveGroup">Сохранить</AppButton>
         </template>
       </FormBase>
     </transition>
@@ -55,6 +57,7 @@
 import Toolbar from '@/components/Toolbar'
 import FormBase from '@/components/Form/FormBase'
 import FormInput from '@/components/Form/FormInput'
+import FormSelect from '@/components/Form/FormSelect'
 import DataTable from '@/components/DataTable/DataTable.vue'
 import Search from '@/components/DataTable/Search.vue'
 import AppButton from '@/components/ui/AppButton.vue'
@@ -71,7 +74,8 @@ export default {
     DataTable,
     AppButton,
     OverScreen,
-    Search
+    Search,
+    FormSelect
   },
 
 
@@ -80,9 +84,13 @@ export default {
       isSaveDialog: false,
       isDeleteDialog: false,
       isOverScreen: false,
-      groupValue: "",
+      selectedServices: null,
       groupId: "",
       group: "",
+      groupList: {
+        groupName: "",
+        serviceId: null
+      },
 
       // заголовки столбцов таблицы
       headers: [
@@ -104,32 +112,37 @@ export default {
 
     // открытие диалога сохранения группы
     openSaveDialog() {
-      this.isSaveDialog = true;
-      this.isOverScreen = true;
+      this.groupList.groupName = ""
+      this.groupList.serviceId = null
+      this.selectedServices = null
+      this.isSaveDialog = true
+      this.isOverScreen = true
     },
 
     // закрытие диалога сохранения группы
     closeSaveDialog() {
-      this.isSaveDialog = false;
-      this.isOverScreen = false;
+      this.isSaveDialog = false
+      this.isOverScreen = false
     },
 
     // сохранение группы в базу
     saveGroup() {
-      if (this.groupValue !== "") {
-        this.$store.dispatch("SET_GROUPS", this.groupValue);
-        this.isSaveDialog = false;
-        this.isOverScreen = false;
-        this.groupValue = "";
+      if (this.groupList.groupName !== '') {
+        this.$store.dispatch("SET_GROUPS", this.groupList)
+        this.isSaveDialog = false
+        this.isOverScreen = false
+        this.groupList.groupName = ""
+        this.groupList.serviceId = null
+        this.selectedServices = null
       }
     },
 
     // открытие диалога подтверждения удаления группы 
     openConfirmationDialog(group) {
       this.groupId = group.id
-      this.group = group.group_name;
-      this.isDeleteDialog = true;
-      this.isOverScreen = true;
+      this.group = group.group_name
+      this.isDeleteDialog = true
+      this.isOverScreen = true
     },
 
     // закрытие диалога удаления группы
@@ -145,16 +158,30 @@ export default {
       this.isOverScreen = false;
     },
 
-    ...mapActions(["GET_GROUPS"]),
+    ...mapActions([
+      "GET_GROUPS",
+      "GET_SERVICES"
+    ]),
   },
 
   computed: {
-    ...mapGetters(["GROUPS"]),
+    ...mapGetters([
+      "GROUPS",
+      "SERVICES"
+    ]),
   },
-  
+
   mounted() {
     this.GET_GROUPS();
+    this.GET_SERVICES();
+
   },
+
+  watch: {
+    selectedServices() {
+      this.groupList.serviceId = this.selectedServices?.id
+    }
+  }
 
 };
 </script>

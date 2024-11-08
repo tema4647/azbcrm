@@ -5,7 +5,7 @@
       <OverScreen v-if="isOverScreen"></OverScreen>
     </transition>
     <!-- незабыть переписать selectionList в динамику, SelectionList2 временый вариант  -->
-    <SelectionList2 :system="SYSTEM" :business="BUSINESS" @select="selectItem" />
+    <SelectionList2  :business="BUSINESS" @select="selectItem" />
     <!-- таблица -->
     <DataTable :headers="currentHeaders" :items="currentListItem">
       <template #header>
@@ -28,7 +28,7 @@
         </template>
         <template #footer>
           <AppButton class="btn-rounded btn-empty" @click.prevent="closeSaveDialog">Отменить</AppButton>
-          <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveService">Сохранить</AppButton>
+          <AppButton :disabled="!Object.values(servicesList).every(item => item)" class="btn-rounded btn-success text-white" @click.prevent="saveService">Сохранить</AppButton>
         </template>
       </FormBase>
     </transition>
@@ -40,8 +40,8 @@
           Создать абонемент
         </template>
         <template #body>
-          <FormInput lable="Название" type="text" v-model="ticketsList.ticketName" />
-          <FormSelect2 v-model:select="selectedServices" :options="SERVICES" lable="Услуга"></FormSelect2>
+          <FormInput lable="Название абонемента" type="text" v-model="ticketsList.ticketName" />
+          <FormSelect v-model:select="selectedServices" :options="SERVICES" optionFieldName="service_name" lable="Услуга"></FormSelect>
           <FormInput lable="Кол-во посещений" type="number" v-model="ticketsList.ticketVisits" />
           <FormInput lable="Дисконт, ₽ " type="number" v-model="ticketsList.ticketDiscount" />
           <div class="formResult-wrapper">
@@ -53,13 +53,10 @@
           </div>
 
 
-          <!-- <FormInput lable="Стоимость" type="number" v-model="ticketsList.ticketCost" /> -->
-
-
         </template>
         <template #footer>
           <AppButton class="btn-rounded btn-empty" @click.prevent="closeSaveDialog">Отменить</AppButton>
-          <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveTicket">Сохранить</AppButton>
+          <AppButton :disabled="!Object.values(ticketsList).every(item => item)" class="btn-rounded btn-success text-white" @click.prevent="saveTicket">Сохранить</AppButton>
         </template>
       </FormBase>
     </transition>
@@ -74,7 +71,7 @@ import AppButton from '@/components/ui/AppButton.vue'
 import FormBase from '@/components/Form/FormBase'
 import OverScreen from '@/components/ui/OverScreen'
 import FormInput from '@/components/Form/FormInput'
-import FormSelect2 from '@/components/Form/FormSelect2'
+import FormSelect from '@/components/Form/FormSelect'
 
 
 
@@ -92,7 +89,7 @@ export default {
     FormBase,
     OverScreen,
     FormInput,
-    FormSelect2
+    FormSelect
   },
 
   data() {
@@ -108,7 +105,7 @@ export default {
 
       ticketsList: {
         ticketName: '',
-        service_id: 0,
+        service_id: null,
         ticketVisits: 0,
         ticketDiscount: 0,
         ticketCost: 0,
@@ -159,25 +156,14 @@ export default {
         { id: 2, group_name: 'Абонементы' },
       ],
 
-      SYSTEM: [
-        { id: 1, group_name: '6', border_color: 'red' },
-        { id: 2, group_name: '7', border_color: 'blue' },
-        { id: 3, group_name: '8', border_color: 'green' },
-        { id: 4, group_name: '9', border_color: 'yellow' },
-      ],
+     
 
       // tabs: [
-      //   {
-      //     name: 'system',
-      //     icon: 'fa-solid fa-gear',
-      //     size: 'lg',
-      //   },
       //   {
       //     name: 'business',
       //     icon: 'fa-solid fa-square-poll-horizontal',
       //     size: 'lg',
-      //   },
-
+      //   }
       // ]
 
     }
@@ -185,10 +171,12 @@ export default {
   computed: {
 
     computedTicketCost() {
-      const currentServiceCost = this.SERVICES[this.ticketsList.service_id - 1]
-      const ticketCost = (currentServiceCost?.service_cost * this.ticketsList.ticketVisits) - this.ticketsList.ticketDiscount
-      return ticketCost ? ticketCost : currentServiceCost?.service_cost
+      const currentService = this.SERVICES.find(service => service.id == this.ticketsList.service_id)
+      const ticketCost = (currentService?.service_cost * this.ticketsList.ticketVisits) - this.ticketsList.ticketDiscount
+      return ticketCost ? ticketCost : currentService?.service_cost
     },
+
+
 
     computedVisitCost() {
       if (!this.ticketsList.ticketVisits) return undefined
@@ -219,6 +207,8 @@ export default {
   },
 
   methods: {
+
+
     selectItem(item) {
       this.currentItem = item
     },
@@ -241,12 +231,12 @@ export default {
 
     saveTicket() {
       this.$store.dispatch('SET_TICKETS', this.ticketsList)
-      this.servicesList.serviceName = ''
-      this.servicesList.serviceCost = 0
-      this.servicesList.ticketCost = 0
-      this.servicesList.ticketDiscount = 0
-      this.servicesList.ticketVisits = 0
-      this.servicesList.service_id = 0
+
+      this.ticketsList.ticketCost = 0
+      this.ticketsList.ticketDiscount = 0
+      this.ticketsList.ticketVisits = 0
+      this.ticketsList.service_id = null
+      this.selectedServices = null
       if (this.currentItem == 'Услуги') {
         this.isSaveDialogServices = false
         this.isOverScreen = false
@@ -271,10 +261,19 @@ export default {
 
     closeSaveDialog() {
       if (this.currentItem == 'Услуги') {
+        this.servicesList.serviceName = ''
+        this.servicesList.serviceCost = 0
+
         this.isSaveDialogServices = false
         this.isOverScreen = false
 
       } else {
+        this.ticketsList.ticketCost = 0
+        this.ticketsList.ticketDiscount = 0
+        this.ticketsList.ticketVisits = 0
+        this.ticketsList.service_id = null
+        this.selectedServices = null
+
         this.isSaveDialogTickets = false
         this.isOverScreen = false
       }
@@ -290,6 +289,11 @@ export default {
     selectedServices() {
       // опциональная цепочка "?" 
       this.ticketsList.service_id = this.selectedServices?.id
+      // console.log(this.computedTicketCost);
+
+      // console.log(this.selectedServices?.service_cost);
+
+
     },
 
     // вычисляем стоимость абонемента исходя из стоимости услуги, кол-ва посещений, и дисконта

@@ -19,11 +19,13 @@
     </Teleport>
 
     <!-- панель выбора  -->
-    <SelectionList :groups="GROUPS" :trial="TRIAL" :individuals="INDIVIDUALS" :tabs="tabs" @select="selectItem" />
+    <SelectionList :groups="GROUPS" :individuals="INDIVIDUALS" :trials="TRIALS" :tabs="tabs" @select="selectItem" />
+
 
     <!-- таблица -->
     <MarkTable @openPaymentDialog="openPaymentDialog" @openClientData="openClientData" @toggleMark="toggleMark"
-      @rightClick="rightClick" :group="group" :clients="CLIENTS">
+      @rightClick="rightClick" :group="group" :individual="individual"
+      :currentGroupOrIndividual="currentGroupOrIndividual" :clients="CLIENTS">
     </MarkTable>
 
     <!-- диалог оплаты -->
@@ -43,6 +45,9 @@
       </FormBase>
     </transition>
 
+   
+
+
   </div>
 </template>
 
@@ -58,6 +63,7 @@ import FormInput from '@/components/Form/FormInput'
 import AppButton from '@/components/ui/AppButton.vue'
 import ClientData from '@/components/ClientData.vue'
 import Popup from '@/components/Popup/Popup.vue'
+import FormSelect from '@/components/Form/FormSelect'
 
 
 
@@ -74,7 +80,8 @@ export default {
     AppButton,
     ClientData,
     FormInput,
-    Popup
+    Popup,
+    FormSelect
   },
 
   data() {
@@ -84,7 +91,9 @@ export default {
       isPaymentDialog: false,
       isOverScreen: false,
       client: null,
-      group: '',
+      currentGroupOrIndividual: {},
+      group: {},
+      individual: {},
       price: 500.00,
       currentClientAmount: 0.00,
       currentClientDeposit: 0.00,
@@ -110,29 +119,27 @@ export default {
         client_parent_amount: 0.00,
         group_id: null,
       },
+
       visitValue: {
         client_id: null,
         visit_date: ''
       },
 
-      INDIVIDUALS: [
-        { id: 1, group_name: 'egoza' },
-        { id: 2, group_name: 'xerox' },
-        { id: 3, group_name: 'vrton' },
-        { id: 4, group_name: 'melekot' },
-      ],
+      TRIALS: [
+        {
+          id: 1,
+          client_name: 'Оборина В.С'
+        },
 
-      TRIAL: [
-        { id: 1, group_name: '6', border_color: 'red' },
-        { id: 2, group_name: '7', border_color: 'blue' },
-        { id: 3, group_name: '8', border_color: 'green' },
-        { id: 4, group_name: '9', border_color: 'yellow' },
+        {
+          id: 2,
+          client_name: 'Галкин Е.В'
+        },
       ],
-
 
       tabs: [
         {
-          name: 'trial',
+          name: 'trials',
           icon: 'fa-solid fa-bullseye',
           size: 'lg',
         },
@@ -159,13 +166,14 @@ export default {
       return result
     },
 
-    
-
     ...mapGetters([
-        "GROUPS",
-        "CLIENTS",
-        "VISITS"
-      ]),
+      "GROUPS",
+      "CLIENTS",
+      "VISITS",
+      "INDIVIDUALS",
+      "SERVICES",
+      "TICKETS"
+    ]),
   },
 
   methods: {
@@ -189,16 +197,27 @@ export default {
     },
 
     // отметка посешения и списания денег со счета
-    async toggleMark([client, cell]) {
+    async toggleMark([client, cell, currentGroupOrIndividual]) {
+
       if (cell.isMarked) {
         alert('Повторная отметка посещения невозможна')
       } else {
+
+        // проверяем есть ли абонементы у клиента 
+        const [currentTickets] = client.tickets.lenght != 0 ? client.tickets : undefined
+        // проверяем есть ли абонемент на услугу, если есть определяем стоимость списания по абонементу
+        const currentTicketCost = currentTickets?.service_id == currentGroupOrIndividual.service_id ? currentTickets.visit_cost : undefined
+        // определяем стоимость услуги в зависимости от груповых или индивидуальных занятий
+        const [currentServiceCost] = 'group_name' in currentGroupOrIndividual ? client?.groups.map(group => group?.services.service_cost) : client?.individuals.map(individual => individual?.services.service_cost)
+        // определяем текущую стоимость списания в зависимости есть ли абонемент или нет, если абонемент есть спишется стоимость по абонементу, если нет спишеться стоимость услуги.
+        const currentValue = currentTicketCost ? currentTicketCost : currentServiceCost
+
         this.visitValue.client_id = client.id
         this.visitValue.visit_date = cell.day
 
         await this.$store.dispatch('SET_VISITS', this.visitValue)
 
-        const result = client.client_parent_amount - this.price;
+        const result = client.client_parent_amount - currentValue
 
         this.clientId = client.id;
         this.clientSet.client_child_fio = client.client_child_fio;
@@ -223,9 +242,15 @@ export default {
 
     },
 
-    // определение группы в "SelectionList"
-    selectItem(item) {
-      this.group = item
+    // определение item в "SelectionList"
+    selectItem([item]) {
+      if ('group_name' in item) {
+        this.currentGroupOrIndividual = item
+        this.group = item
+      } else if ('individual_name' in item) {
+        this.currentGroupOrIndividual = item
+        this.individual = item
+      }
     },
 
 
@@ -268,7 +293,6 @@ export default {
 
     },
 
-
     // открытие карточки клиента
     openClientData(client) {
       this.isClientData = true
@@ -284,7 +308,10 @@ export default {
     ...mapActions([
       "GET_GROUPS",
       "GET_CLIENTS",
-      "GET_VISITS"
+      "GET_VISITS",
+      "GET_INDIVIDUALS",
+      "GET_SERVICES",
+      "GET_TICKETS"
     ]),
 
   },
@@ -298,9 +325,12 @@ export default {
 
 
   mounted() {
-    this.GET_GROUPS();
-    this.GET_CLIENTS();
-    this.GET_VISITS();
+    this.GET_GROUPS()
+    this.GET_CLIENTS()
+    this.GET_VISITS()
+    this.GET_INDIVIDUALS()
+    this.GET_SERVICES()
+    this.GET_TICKETS()
   },
 
 }

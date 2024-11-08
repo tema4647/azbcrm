@@ -1,29 +1,32 @@
 <template>
-  <button :class="{disabled: disabled}" class="button">
+  <button :class="{ disabled: disabled }" class="button">
     <slot></slot>
   </button>
+
 </template>
 
 <script>
-  export default {
-    name:'AppButton',
-    props:{
-      disabled:{
-        type: Boolean,
-        default: false
-      }
+export default {
+  name: 'AppButton',
+  data() {
+    return {
+
     }
-      
-    ,
-    data(){
-      return{
-      }
-    }
+  },
+
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
   }
+
+
+}
 </script>
 
 <style lang="scss" scoped>
-.button{
+.button {
   display: flex;
   align-items: center;
   min-width: 30px;
@@ -33,10 +36,10 @@
   padding: 15px;
   font-family: inherit;
   font-size: 13px;
-  }
-  .disabled{
-    pointer-events: none;
-    opacity: .5;
-  }
+}
 
+.disabled {
+  pointer-events: none;
+  opacity: .5;
+}
 </style>

@@ -1,20 +1,22 @@
 <template>
   <AppBase>
-    <div class="selectionList" >
+    <div class="selectionList">
       <div v-if="tabs.length < 2 ? false : true" class="selectionList__header">
-        <!-- Класс "icon-border" приходит из global.css -->
-        <button class="icon-border" :class="{ 'icon-active': currentTab === tab.name }" v-for="tab in tabs"
+      <!-- Класс "icon-border" приходит из global.css -->
+      <button class="icon-border" :class="{ 'icon-active': currentTab === tab.name }" v-for="tab in tabs"
           :key="tab.name" @click="handleTab(tab)">
           <font-awesome-icon :icon="tab.icon" :size="tab.size" />
         </button>
       </div>
 
       <div class="selectionList__body" >
-        <div class="selectionList__items" :style='{ borderLeft: `3px solid ${item.border_color}` }'
-          v-for="item in listItems" :key="item" @click="handleItem(item.group_name)">
-          <span class="item__name">{{ item.group_name }}</span>
+        <div class="selectionList__items"
+          v-for="item  in listItems" :key="item" @click="handleItem(item)" >
+          <span class="item__name">{{ item.group_name || item.individual_name || item.client_name }}</span>
+
         </div>
       </div>
+
     </div>
   </AppBase>
 </template>
@@ -24,12 +26,15 @@ import AppBase from '@/components/ui/AppBase.vue'
 
 export default {
   name: 'SelectionList',
+
   components: {
     AppBase,
   },
 
   props: {
-    trial: {
+
+
+    trials:{
       type: Array,
       default: function () {
         return []
@@ -43,7 +48,15 @@ export default {
       },
     },
 
+
     individuals: {
+      type: Array,
+      default: function () {
+        return []
+      },
+    },
+
+    business:{
       type: Array,
       default: function () {
         return []
@@ -71,17 +84,15 @@ export default {
 
   computed: {
     listItems() {
-      
       return this.selectedListItems ? this.selectedListItems : this.groups
-
-    },
-
+    }
   },
 
   methods: {
 
     handleItem(item) {
-      this.currentItem = item
+      this.currentItem = [item]
+
     },
 
     handleTab(tab) {
@@ -91,9 +102,10 @@ export default {
   },
 
   watch: {
-    listItems:{
+    listItems: {
       handler(listItems) {
-        this.currentItem = listItems[0]?.group_name
+        this.currentItem =  listItems
+        
       },
     },
 
@@ -124,7 +136,6 @@ export default {
   top: 0;
   left: 0;
 }
-
 
 .selectionList__body::-webkit-scrollbar {
   width: 0;

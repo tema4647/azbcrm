@@ -2,7 +2,8 @@
   <AppBase>
     <div class="mark-table">
       <div class="mark-table__header">
-        <span class="mark-table__header-group">{{ group }}</span>
+        <span class="mark-table__header-group">{{ currentGroupOrIndividual.group_name ||
+          currentGroupOrIndividual.individual_name }}</span>
         <div class="date-wrapper">
           <div class="date__arrow date__arrow-l" @click="monthPrevious"><font-awesome-icon
               :icon="['fas', 'caret-left']" /></div>
@@ -33,18 +34,18 @@
 
           <span class="longCard__title" @click="handleClick2(client)">{{ client.client_child_fio }}</span>
           <ul class="longCard__list">
-            <li class="longCard__list-item" @click.prevent.right="rightClick(client, cell, $event)" @dblclick="handleDblclick(client, cell)"
-              v-for="cell in client.days" :key="cell.id">
+            <li class="longCard__list-item" @click.prevent.right="rightClick(client, cell, $event)"
+              @dblclick="handleDblclick(client, cell, currentGroupOrIndividual )" v-for="cell in client.days" :key="cell.id">
               <span class="listItem__dot-mask" :class="{ listItem__dot: cell.isMarked }"></span>
             </li>
           </ul>
           <div class="moneyTrue" @click="handleClick(client)">
-            <font-awesome-icon icon="fa-solid fa-credit-card" size="xs"/>
+            <font-awesome-icon icon="fa-solid fa-credit-card" size="xs" />
           </div>
         </div>
       </div>
 
-      
+
 
     </div>
   </AppBase>
@@ -73,10 +74,12 @@ export default {
   },
 
   props: {
-    group: String,
+    currentGroupOrIndividual: Object,
+    group: Object,
+    individual: Object,
     clients: Array
   },
-  
+
   emits: ['openPaymentDialog', 'openClientData', 'toggleMark', 'rightClick'],
   data() {
     return {
@@ -91,7 +94,6 @@ export default {
   },
 
   computed: {
-
     // вычисляем все даты месяца
     allDatesMonth() {
       const days = []
@@ -129,18 +131,25 @@ export default {
       return clientsWithDays
     },
 
-    // фильтруем клиентов по группе
+    // фильтруем клиентов по группе или индивидуадьному занятиюf
     filterClients() {
       return this.clientsWithDays.filter((client) => {
-        for (let group of client.groups) {
-          return group.group_name == this.group
+        if ('group_name' in this.currentGroupOrIndividual) {
+          for (let group of client.groups) {
+            return group.group_name == this.currentGroupOrIndividual.group_name
+          }
         }
+        if ('individual_name' in this.currentGroupOrIndividual) {
+          for (let individual of client.individuals) {
+            return individual.individual_name == this.currentGroupOrIndividual.individual_name
+          }
+        }
+
       })
     }
   },
 
   methods: {
-
     monthNext() {
       this.date.currentDate = dayjs(this.date.currentDate).add(1, 'month')
       this.date.currentMonth = this.date.currentDate.format('MMMM YYYY')
@@ -163,15 +172,15 @@ export default {
       this.$emit("openClientData", client)
     },
 
-    handleDblclick(client, cell) {
-      this.$emit("toggleMark", [client, cell])
+    handleDblclick(client, cell, currentGroupOrIndividual) {
+      this.$emit("toggleMark", [client, cell, currentGroupOrIndividual])
     },
 
     rightClick(client, cell, $event) {
       this.$emit("rightClick", [client, cell, $event])
     },
-  },
 
+  },
 
 }
 </script>

@@ -33,11 +33,12 @@
           <FormInput v-model="clientSet.client_parent_email" lable="Email" type="text"
             placeholder="Например, tratata@yandex.ru" />
 
-          <FormSelect v-model:select="selectedGroups" :options="GROUPS" lable="Группа"></FormSelect>
+          <FormSelect v-model:select="selectedGroups" :options="GROUPS" optionFieldName="group_name" lable="Группа"></FormSelect>
         </template>
         <template #footer>
           <AppButton class="btn-rounded btn-empty" @click.prevent="closeSaveDialog">Отменить</AppButton>
           <AppButton class="btn-rounded btn-success text-white" @click.prevent="saveClient">Сохранить</AppButton>
+          
         </template>
       </FormBase>
     </transition>
@@ -59,7 +60,7 @@
           <FormInput v-model="clientSet.client_parent_email" lable="Email" type="text"
             placeholder="Например, tratata@yandex.ru" />
 
-          <FormSelect v-model:select="selectedGroups" :options="GROUPS" lable="Группа"></FormSelect>
+          <FormSelect v-model:select="selectedGroups" :options="GROUPS" optionFieldName="group_name" lable="Группа"></FormSelect>
         </template>
         <template #footer>
           <AppButton class="btn-rounded btn-empty" @click.prevent="closeEditDialog">Отменить</AppButton>
@@ -206,6 +207,13 @@ export default {
 
     // закрытие диалога сохранения клиента
     closeSaveDialog() {
+      this.selectedGroups = null;
+      this.clientSet.client_child_fio = '';
+      this.clientSet.client_child_birth = '';
+      this.clientSet.client_parent_fio = '';
+      this.clientSet.client_parent_phone = '';
+      this.clientSet.client_parent_email = '';
+      this.clientSet.group_id = '';
       this.isSaveDialog = false;
       this.isOverScreen = false;
     },
@@ -239,14 +247,8 @@ export default {
 
     },
 
-    // закрытие диалога сохранения клиента
+    // закрытие диалога обновления клиента
     closeEditDialog() {
-      this.clientSet.client_child_fio = '';
-      this.clientSet.client_child_birth = '';
-      this.clientSet.client_parent_fio = '';
-      this.clientSet.client_parent_phone = '';
-      this.clientSet.client_parent_email = '';
-      this.clientSet.group_id = '';
       this.isEditDialog = false;
       this.isOverScreen = false;
     },

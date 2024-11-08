@@ -11,7 +11,7 @@ export default {
         },
 
         ADD_SERVICE: (state, data) => {
-            state.services.unshift(data)
+            state.services.push(data)
 
         },
         UPDATE_SERVICE: (state, data) => {

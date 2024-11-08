@@ -32,9 +32,11 @@ export default {
       })
      },
 
-     SET_GROUPS({commit}, groupValue ){
+     SET_GROUPS({commit}, groupList ){
       return axios.post('http://127.0.0.1:8000/api/v1/groups', {
-       group_name: groupValue
+       group_name: groupList.groupName,
+       service_id: groupList.serviceId
+
       }
      )
      .then((groups) =>{

@@ -1,6 +1,6 @@
 <template>
   <div class="analytics">
-    <SelectionList2 :system="SYSTEM" :business="BUSINESS"></SelectionList2>
+    <SelectionList2  :business="BUSINESS"></SelectionList2>
     <div class="widgets-wrapper" >
       <DataWidget v-for="finance in finances" :items="finance"></DataWidget>
     </div>
@@ -42,12 +42,6 @@ export default {
         { id: 2, group_name: 'Операционка' },
       ],
 
-      SYSTEM: [
-        { id: 1, group_name: '6', border_color: 'red' },
-        { id: 2, group_name: '7', border_color: 'blue' },
-        { id: 3, group_name: '8', border_color: 'green' },
-        { id: 4, group_name: '9', border_color: 'yellow' },
-      ],
     }
   }
 }
