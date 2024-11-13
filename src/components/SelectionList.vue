@@ -32,8 +32,6 @@ export default {
   },
 
   props: {
-
-
     trials:{
       type: Array,
       default: function () {
@@ -63,14 +61,12 @@ export default {
       },
     },
 
-
     tabs: {
       type: Array,
       default: function () {
         return []
       },
     }
-
   },
 
 
@@ -84,7 +80,7 @@ export default {
 
   computed: {
     listItems() {
-      return this.selectedListItems ? this.selectedListItems : this.groups
+        return this.selectedListItems ? this.selectedListItems : this.groups
     }
   },
 
@@ -98,14 +94,16 @@ export default {
     handleTab(tab) {
       this.selectedListItems = this[tab.name]
       this.currentTab = tab.name
+      // console.log(this.selectedListItems);
+      
     },
   },
+
 
   watch: {
     listItems: {
       handler(listItems) {
         this.currentItem =  listItems
-        
       },
     },
 

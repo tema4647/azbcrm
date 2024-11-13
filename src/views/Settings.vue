@@ -5,9 +5,9 @@
       <OverScreen v-if="isOverScreen"></OverScreen>
     </transition>
     <!-- незабыть переписать selectionList в динамику, SelectionList2 временый вариант  -->
-    <SelectionList2  :business="BUSINESS" @select="selectItem" />
+    <SelectionList2 :business="BUSINESS" @select="selectItem" />
     <!-- таблица -->
-    <DataTable :headers="currentHeaders" :items="currentListItem">
+    <DataTable :headers="currentHeaders" :items="currentListItem" @deleteItem="openDeleteIndividualsDialog">
       <template #header>
         <AppButton class="btn-success btn-rounded text-white" @click="openSaveDialog">
           Добавить
@@ -28,7 +28,8 @@
         </template>
         <template #footer>
           <AppButton class="btn-rounded btn-empty" @click.prevent="closeSaveDialog">Отменить</AppButton>
-          <AppButton :disabled="!Object.values(servicesList).every(item => item)" class="btn-rounded btn-success text-white" @click.prevent="saveService">Сохранить</AppButton>
+          <AppButton :disabled="!Object.values(servicesList).every(item => item)"
+            class="btn-rounded btn-success text-white" @click.prevent="saveService">Сохранить</AppButton>
         </template>
       </FormBase>
     </transition>
@@ -41,12 +42,13 @@
         </template>
         <template #body>
           <FormInput lable="Название абонемента" type="text" v-model="ticketsList.ticketName" />
-          <FormSelect v-model:select="selectedServices" :options="SERVICES" optionFieldName="service_name" lable="Услуга"></FormSelect>
+          <FormSelect v-model:select="selectedServicesForTicket" :options="SERVICES" optionFieldName="service_name"
+            lable="Услуга"></FormSelect>
           <FormInput lable="Кол-во посещений" type="number" v-model="ticketsList.ticketVisits" />
           <FormInput lable="Дисконт, ₽ " type="number" v-model="ticketsList.ticketDiscount" />
           <div class="formResult-wrapper">
             <div class="formResult"><span>Стоимость абонемента</span><span class="formResult_number">{{
-        computedTicketCost }}</span></div>
+                computedTicketCost }}</span></div>
             <div class="formResult"><span>Стоимость занятия</span><span class="formResult_number">{{ computedVisitCost
                 }}</span>
             </div>
@@ -56,7 +58,45 @@
         </template>
         <template #footer>
           <AppButton class="btn-rounded btn-empty" @click.prevent="closeSaveDialog">Отменить</AppButton>
-          <AppButton :disabled="!Object.values(ticketsList).every(item => item)" class="btn-rounded btn-success text-white" @click.prevent="saveTicket">Сохранить</AppButton>
+          <AppButton :disabled="!Object.values(ticketsList).every(item => item)"
+            class="btn-rounded btn-success text-white" @click.prevent="saveTicket">Сохранить</AppButton>
+        </template>
+      </FormBase>
+    </transition>
+
+    <!-- диалог добавления преподавателя в базу -->
+    <transition name="fade">
+      <FormBase v-if="isSaveDialogIndividuals" @closeDialog="closeSaveDialog">
+        <template #header>
+          Добавить преподавателя
+        </template>
+        <template #body>
+          <FormInput lable="Ф.И.О" type="text" v-model="individualsList.individualName" />
+          <FormSelect v-model:select="selectedServicesForIndividuals" :options="SERVICES" optionFieldName="service_name"
+            lable="Услуга"></FormSelect>
+        </template>
+        <template #footer>
+          <AppButton class="btn-rounded btn-empty" @click.prevent="closeSaveDialog">Отменить</AppButton>
+          <AppButton :disabled="!Object.values(individualsList).every(item => item)"
+            class="btn-rounded btn-success text-white" @click.prevent="saveIndividual">Сохранить</AppButton>
+        </template>
+      </FormBase>
+    </transition>
+
+    <!-- диалог удаления преподавателя из базы -->
+    <transition name="fade">
+      <FormBase class="baseDialogPlace" v-if="isDeleteIndividualsDialog" @closeDialog="closeConfirmationDialog">
+        <template #header>
+          Удалить преподавателя
+        </template>
+        <template #body>
+          <p style="font-size: 14px; line-height: 22px;">Вы действительно хотите удалить преподавателя <strong
+              style="font-size: 18px"> "{{ individual.individual_name }}" </strong> и все ее данные? <br>
+            После удаления восстановить их будет невозможно.</p>
+        </template>
+        <template #footer>
+          <AppButton class="btn-rounded btn-success btn-empty" @click="closeConfirmationDialog">Отменить</AppButton>
+          <AppButton class="btn-rounded btn-danger text-white" @click.prevent="deleteIndividuals">Удалить</AppButton>
         </template>
       </FormBase>
     </transition>
@@ -96,11 +136,21 @@ export default {
     return {
       isSaveDialogTickets: false,
       isSaveDialogServices: false,
+      isSaveDialogIndividuals: false,
+      isDeleteIndividualsDialog: false,
+
       isOverScreen: false,
-      selectedServices: null,
+      selectedServicesForTicket: null,
+      selectedServicesForIndividuals: null,
+      individual: null,
       servicesList: {
         serviceName: '',
         serviceCost: 0,
+      },
+
+      individualsList: {
+        individualName: '',
+        service_id: null,
       },
 
       ticketsList: {
@@ -151,12 +201,21 @@ export default {
 
       ],
 
+      headersindividuals: [
+        {
+          key: 'individual_name',
+          label: 'Ф.И.О'
+        },
+
+      ],
+
       BUSINESS: [
         { id: 1, group_name: 'Услуги' },
         { id: 2, group_name: 'Абонементы' },
+        { id: 3, group_name: 'Преподаватели' },
       ],
 
-     
+
 
       // tabs: [
       //   {
@@ -187,26 +246,46 @@ export default {
     currentListItem() {
       if (this.currentItem == 'Услуги') {
         return this.SERVICES
-      } else {
+      } else if (this.currentItem == 'Абонементы') {
         return this.TICKETS
+      } else {
+        return this.INDIVIDUALS
+
       }
     },
 
     currentHeaders() {
       if (this.currentItem == 'Услуги') {
         return this.headersServices
-      } else {
+      } else if (this.currentItem == 'Абонементы') {
         return this.headersTickets
+      } else {
+        return this.headersindividuals
       }
     },
 
     ...mapGetters([
       'SERVICES',
-      'TICKETS'
+      'TICKETS',
+      'INDIVIDUALS'
     ])
   },
 
   methods: {
+
+    openDeleteIndividualsDialog(individual) {
+      this.individual = individual
+      this.isDeleteIndividualsDialog = true
+    },
+
+    
+    // удаление преподавателя из базы
+
+    deleteIndividuals() {
+      this.$store.dispatch("DELETE_INDIVIDUAL", this.individual.id);
+      this.isDeleteIndividualsDialog = false;
+      this.isOverScreen = false;
+    },
 
 
     selectItem(item) {
@@ -227,6 +306,23 @@ export default {
         this.isOverScreen = false
       }
 
+    },
+
+    saveIndividual() {
+      this.$store.dispatch('SET_INDIVIDUALS', this.individualsList)
+      this.individualsList.individualName = ''
+      this.individualsList.service_id = null
+      if (this.currentItem == 'Услуги') {
+        this.isSaveDialogServices = false
+        this.isOverScreen = false
+
+      } else if (this.currentItem == 'Абонементы') {
+        this.isSaveDialogTickets = false
+        this.isOverScreen = false
+      } else {
+        this.isSaveDialogIndividuals = false
+        this.isOverScreen = false
+      }
     },
 
     saveTicket() {
@@ -252,8 +348,11 @@ export default {
         this.isSaveDialogServices = true
         this.isOverScreen = true
 
-      } else {
+      } else if (this.currentItem == 'Абонементы') {
         this.isSaveDialogTickets = true
+        this.isOverScreen = true
+      } else {
+        this.isSaveDialogIndividuals = true
         this.isOverScreen = true
       }
 
@@ -267,7 +366,7 @@ export default {
         this.isSaveDialogServices = false
         this.isOverScreen = false
 
-      } else {
+      } else if(this.currentItem == 'Абонементы') {
         this.ticketsList.ticketCost = 0
         this.ticketsList.ticketDiscount = 0
         this.ticketsList.ticketVisits = 0
@@ -276,24 +375,29 @@ export default {
 
         this.isSaveDialogTickets = false
         this.isOverScreen = false
+      }else {
+        this.isSaveDialogIndividuals = false
+        this.isOverScreen = false
       }
     },
     ...mapActions([
       'GET_SERVICES',
-      'GET_TICKETS'
+      'GET_TICKETS',
+      'GET_INDIVIDUALS'
     ])
   },
 
   watch: {
-    // следим за выбором услуги
-    selectedServices() {
+    // следим за выбором услуги в абонементах
+    selectedServicesForTicket() {
       // опциональная цепочка "?" 
-      this.ticketsList.service_id = this.selectedServices?.id
-      // console.log(this.computedTicketCost);
+      this.ticketsList.service_id = this.selectedServicesForTicket?.id
+    },
 
-      // console.log(this.selectedServices?.service_cost);
-
-
+    // следим за выбором услуги в преподавателях
+    selectedServicesForIndividuals() {
+      // опциональная цепочка "?" 
+      this.individualsList.service_id = this.selectedServicesForIndividuals?.id
     },
 
     // вычисляем стоимость абонемента исходя из стоимости услуги, кол-ва посещений, и дисконта
@@ -309,6 +413,7 @@ export default {
   mounted() {
     this.GET_SERVICES();
     this.GET_TICKETS();
+    this.GET_INDIVIDUALS();
   }
 }
 </script>

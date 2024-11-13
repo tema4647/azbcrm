@@ -1,5 +1,5 @@
 <template>
-    <div class="formSelect">
+    <div class="formSelect" hidden>
         <!-- подпись поля select -->
         <label class="formSelect__lable">{{ lable }}</label>
         <!-- select -->
@@ -24,12 +24,12 @@ export default {
             type: Array
         },
 
-        optionFieldName:{
+        optionFieldName: {
             type: String
         }
 
-        
-        
+
+
     },
     data() {
         return {
@@ -38,7 +38,7 @@ export default {
         }
     },
 
-    
+
     methods: {
         handleClick() {
             this.isContent = !this.isContent;
@@ -61,7 +61,14 @@ export default {
     justify-content: space-between;
     width: 100%;
     margin-bottom: 17px;
+    user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
 }
+
 
 .formSelect__lable {
     font-size: 14px;

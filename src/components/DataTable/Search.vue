@@ -1,6 +1,6 @@
 <template>
     <div class="search">
-        <input class="search__input" type="search"  :placeholder=placeholder>
+        <input class="search__input" type="search" :placeholder=placeholder :value="modelValue" @input="handleInput">
     </div>
 </template>
 
@@ -8,7 +8,13 @@
 export default {
     name: 'search',
     props: {
-        placeholder: ''
+        placeholder: '',
+        modelValue: ''
+    },
+    methods: {
+        handleInput(event) {
+            this.$emit('update:modelValue', event.target.value)
+        }
     }
 
 }
@@ -17,7 +23,6 @@ export default {
 <style lang="scss" scoped>
 .search {
     position: relative;
-    // border: 1px solid red;
 }
 
 .search::before {

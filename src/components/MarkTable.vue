@@ -35,7 +35,8 @@
           <span class="longCard__title" @click="handleClick2(client)">{{ client.client_child_fio }}</span>
           <ul class="longCard__list">
             <li class="longCard__list-item" @click.prevent.right="rightClick(client, cell, $event)"
-              @dblclick="handleDblclick(client, cell, currentGroupOrIndividual )" v-for="cell in client.days" :key="cell.id">
+              @dblclick="handleDblclick(client, cell, currentGroupOrIndividual)" v-for="cell in client.days"
+              :key="cell.id">
               <span class="listItem__dot-mask" :class="{ listItem__dot: cell.isMarked }"></span>
             </li>
           </ul>
@@ -131,25 +132,37 @@ export default {
       return clientsWithDays
     },
 
-    // фильтруем клиентов по группе или индивидуадьному занятиюf
+    // фильтруем клиентов по группе или индивидуадьному занятию
     filterClients() {
-      return this.clientsWithDays.filter((client) => {
-        if ('group_name' in this.currentGroupOrIndividual) {
-          for (let group of client.groups) {
-            return group.group_name == this.currentGroupOrIndividual.group_name
-          }
-        }
-        if ('individual_name' in this.currentGroupOrIndividual) {
-          for (let individual of client.individuals) {
-            return individual.individual_name == this.currentGroupOrIndividual.individual_name
-          }
-        }
-
-      })
+      const filterClients = []
+      if ('group_name' in this.currentGroupOrIndividual) {
+        // console.log(this.currentGroupOrIndividual);
+        this.clientsWithDays.forEach((client) => {
+          client.groups.forEach((group) => {
+            if (group.group_name == this.currentGroupOrIndividual.group_name) {
+              filterClients.push(client)
+            }
+          })
+        })
+      }
+      if ('individual_name' in this.currentGroupOrIndividual) {
+        // console.log(this.currentGroupOrIndividual);
+        
+        
+        this.clientsWithDays.forEach((client) => {
+          client.individuals.forEach((individual) => {
+            if (individual.individual_name == this.currentGroupOrIndividual.individual_name) {
+              filterClients.push(client)
+            }
+          })
+        })
+      }
+      return filterClients
     }
   },
 
   methods: {
+
     monthNext() {
       this.date.currentDate = dayjs(this.date.currentDate).add(1, 'month')
       this.date.currentMonth = this.date.currentDate.format('MMMM YYYY')
@@ -181,6 +194,7 @@ export default {
     },
 
   },
+
 
 }
 </script>

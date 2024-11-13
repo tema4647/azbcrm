@@ -31,12 +31,12 @@
     <!-- диалог оплаты -->
     <transition name="fade">
       <FormBase v-if="isPaymentDialog" @closeDialog="closePaymentDialog">
+        
         <template v-slot:header>
           {{ clientSet.client_child_fio }} {{ currentClientDeposit }}
         </template>
         <template v-slot:body>
           <FormInput v-model="currentClientAmount" lable="Сумма" type="number" placeholder="Введите сумму" />
-
         </template>
         <template v-slot:footer>
           <AppButton class="btn-rounded btn-empty" @click="closePaymentDialog">Отменить</AppButton>
@@ -45,7 +45,7 @@
       </FormBase>
     </transition>
 
-   
+
 
 
   </div>
@@ -163,7 +163,7 @@ export default {
   computed: {
     currentSumm() {
       const result = +this.currentClientDeposit + +this.currentClientAmount
-      return result
+      return  result.toFixed(2)
     },
 
     ...mapGetters([
@@ -177,7 +177,6 @@ export default {
   },
 
   methods: {
-
     cancelVisit() {
       alert('этот функционал еще не доработан')
     },
@@ -192,8 +191,6 @@ export default {
       this.isPopup = true
       this.positionPopup.left = $event.x + 'px'
       this.positionPopup.top = $event.y + 'px'
-      console.log(cell);
-
     },
 
     // отметка посешения и списания денег со счета
@@ -220,37 +217,22 @@ export default {
         const result = client.client_parent_amount - currentValue
 
         this.clientId = client.id;
-        this.clientSet.client_child_fio = client.client_child_fio;
-        this.clientSet.client_child_birth = client.client_child_birth;
-        this.clientSet.client_parent_fio = client.client_parent_fio;
-        this.clientSet.client_parent_phone = client.client_parent_phone;
-        this.clientSet.client_parent_email = client.client_parent_email;
         this.clientSet.client_parent_amount = result;
-        const [group] = client.groups;
-        this.clientSet.group_id = group.id;
-
         this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientSet])
-
-        this.clientSet.client_child_fio = '';
-        this.clientSet.client_child_birth = '';
-        this.clientSet.client_parent_fio = '';
-        this.clientSet.client_parent_phone = '';
-        this.clientSet.client_parent_email = '';
-        this.clientSet.group_id = '';
-
       }
 
     },
 
     // определение item в "SelectionList"
-    selectItem([item]) {
+    selectItem([item ]) {
+      if(!item) return this.currentGroupOrIndividual = {}
       if ('group_name' in item) {
-        this.currentGroupOrIndividual = item
+        this.currentGroupOrIndividual = item 
         this.group = item
       } else if ('individual_name' in item) {
-        this.currentGroupOrIndividual = item
+        this.currentGroupOrIndividual = item 
         this.individual = item
-      }
+      } 
     },
 
 
@@ -258,24 +240,13 @@ export default {
     openPaymentDialog(client) {
       this.clientId = client.id;
       this.clientSet.client_child_fio = client.client_child_fio;
-      this.clientSet.client_child_birth = client.client_child_birth;
-      this.clientSet.client_parent_fio = client.client_parent_fio;
-      this.clientSet.client_parent_phone = client.client_parent_phone;
-      this.clientSet.client_parent_email = client.client_parent_email;
-      this.clientSet.client_parent_amount = client.client_parent_amount;
-      const [group] = client.groups;
-      this.clientSet.group_id = group.id;
       this.currentClientDeposit = client.client_parent_amount;
 
       this.isPaymentDialog = true
       this.isOverScreen = true
     },
-    // закрытие диалога оплаты
-    closePaymentDialog() {
-      this.isPaymentDialog = false
-      this.isOverScreen = false
-    },
 
+    // внесение денежных средств
     savePayment() {
       this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientSet])
       this.clientSet.client_child_fio = '';
@@ -290,7 +261,12 @@ export default {
 
       this.isPaymentDialog = false
       this.isOverScreen = false
+    },
 
+    // закрытие диалога оплаты
+    closePaymentDialog() {
+      this.isPaymentDialog = false
+      this.isOverScreen = false
     },
 
     // открытие карточки клиента
@@ -320,7 +296,7 @@ export default {
     currentSumm() {
       // следим за изменением текушей суммы и добовляем в clientSet
       this.clientSet.client_parent_amount = this.currentSumm
-    }
+    },
   },
 
 

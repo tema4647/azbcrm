@@ -60,7 +60,10 @@ export default {
           client_parent_phone: clientSet.client_parent_phone,
           client_parent_email: clientSet.client_parent_email,
           client_parent_amount: clientSet.client_parent_amount,
+          individual_id: clientSet.individual_id,
           group_id: clientSet.group_id,
+          ticket_id: clientSet.ticket_id,
+          
         })
         .then((clients) => {
           commit('UPDATE_CLIENT', clients.data)

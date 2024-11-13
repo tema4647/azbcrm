@@ -7,10 +7,10 @@
 
 
     <!-- таблица с группами -->
-    <DataTable :items="GROUPS" :headers="headers" @deleteItem="openConfirmationDialog">
+    <DataTable :items="searchGroupsFilter" :headers="headers" @deleteItem="openConfirmationDialog">
       <template #header>
         <AppButton @click="openSaveDialog" class="btn-success btn-rounded text-white">Добавить</AppButton>
-        <Search placeholder="Найти группу" />
+        <Search placeholder="Найти группу" v-model="searchGroup" />
       </template>
     </DataTable>
 
@@ -85,6 +85,7 @@ export default {
       isDeleteDialog: false,
       isOverScreen: false,
       selectedServices: null,
+      searchGroup: '',
       groupId: "",
       group: "",
       groupList: {
@@ -99,13 +100,30 @@ export default {
           label: 'Группа'
         },
         {
+          key: 'service_name',
+          label: 'Услуга'
+        },
+        {
           key: 'quantity',
           label: 'Кол-во'
         },
+        
 
       ],
 
     };
+  },
+
+  computed: {
+
+    searchGroupsFilter(){
+      const serchList = this.GROUPS.filter(groups => groups.group_name.match( new RegExp(`${this.searchGroup}`, 'gi')  || []))
+      return serchList
+    },
+    ...mapGetters([
+      "GROUPS",
+      "SERVICES"
+    ]),
   },
 
   methods: {
@@ -164,12 +182,7 @@ export default {
     ]),
   },
 
-  computed: {
-    ...mapGetters([
-      "GROUPS",
-      "SERVICES"
-    ]),
-  },
+  
 
   mounted() {
     this.GET_GROUPS();

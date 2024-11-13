@@ -7,12 +7,12 @@
 
 
     <!-- таблица -->
-    <DataTable :items="clients" :headers="headers" @deleteItem="openConfirmationDialog" @editItem="openEditDialog">
+    <DataTable :items="searchClientsFilter" :headers="headers" @deleteItem="openConfirmationDialog" @editItem="openEditDialog">
       <template #header>
         <AppButton class="btn-success btn-rounded text-white" @click="openSaveDialog">
           Добавить
         </AppButton>
-        <Search placeholder="Найти клиента" />
+        <Search v-model="searchClient" placeholder="Найти клиента" />
       </template>
     </DataTable>
 
@@ -59,8 +59,6 @@
             placeholder="Например, 89128807879" />
           <FormInput v-model="clientSet.client_parent_email" lable="Email" type="text"
             placeholder="Например, tratata@yandex.ru" />
-
-          <FormSelect v-model:select="selectedGroups" :options="GROUPS" optionFieldName="group_name" lable="Группа"></FormSelect>
         </template>
         <template #footer>
           <AppButton class="btn-rounded btn-empty" @click.prevent="closeEditDialog">Отменить</AppButton>
@@ -118,6 +116,7 @@ export default {
       isEditDialog: false,
       isDeleteDialog: false,
       isOverScreen: false,
+      searchClient: '',
       client: null,
       clientId: null,
       selectedGroups: null,
@@ -141,11 +140,6 @@ export default {
         },
 
         {
-          key: 'group_name',
-          label: 'Группа'
-        },
-
-        {
           key: 'client_parent_fio',
           label: 'Родитель'
         },
@@ -165,11 +159,17 @@ export default {
           label: 'Дата рождения',
         },
 
+
       ],
     };
   },
 
   computed: {
+    searchClientsFilter(){
+      const searchList = this.CLIENTS.filter(clients => clients.client_child_fio.match( new RegExp(`${this.searchClient}`, 'gi')   || []))
+      return searchList
+    },
+
 
     // выпримляем многомерный массив для таблицы
     clients() {
@@ -241,7 +241,6 @@ export default {
       this.clientSet.client_parent_phone = client.client_parent_phone;
       this.clientSet.client_parent_email = client.client_parent_email;
       this.clientSet.client_parent_amount = client.client_parent_amount;
-      this.clientSet.group_id = client.group_id;
       this.isEditDialog = true;
       this.isOverScreen = true;
 
@@ -256,13 +255,11 @@ export default {
     // обновление клиента в базе
     editClient() {
       this.$store.dispatch('PUT_CLIENT', [this.clientId,  this.clientSet])
-      this.selectedGroups = null;
       this.clientSet.client_child_fio = '';
       this.clientSet.client_child_birth = '';
       this.clientSet.client_parent_fio = '';
       this.clientSet.client_parent_phone = '';
       this.clientSet.client_parent_email = '';
-      this.clientSet.group_id = '';
       this.isEditDialog = false;
       this.isOverScreen = false;
     },
@@ -297,9 +294,8 @@ export default {
   watch: {
     // следим за выбором группы
     selectedGroups() {
-      // опциональная цепочка "?" 
       this.clientSet.group_id = this.selectedGroups?.id
-    }
+    },
   },
 
   mounted() {

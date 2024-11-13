@@ -27,10 +27,6 @@
                         <div class="part-item__title">Email</div>
                         <div class="part-item__value">{{ client.client_parent_email }}</div>
                     </div>
-                    <div class="part-item border-bottom flex-row space-between">
-                        <div class="part-item__title">Адрес проживания</div>
-                        <div class="part-item__value">г.Пермь, ул.Сапфирная, 20 - кв.45</div>
-                    </div>
                 </div>
 
             </div>
@@ -57,6 +53,7 @@
                         <div class="part-item flex-column">
                             <div class="part-item__title border-bottom">Абонементы</div>
                             <div class="flex-row tickets" v-for="ticket in client.tickets" :key="ticket.id">
+                                <!-- {{ client.tickets }} -->
                                 <div class="part-item__value"> {{ ticket.ticket_name }}</div>
                                 <div class="part-item__value"> {{ ticket.ticket_cost }}</div>
                                 <div class="part-item__value"> {{ ticket.visit_cost }}</div>

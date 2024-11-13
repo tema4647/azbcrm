@@ -1,6 +1,6 @@
 <template>
     <!-- диалог оформления услуги и оплаты -->
-    <FormBase>
+    <FormBase @closeDialog="closeDialog">
         <template v-slot:header>
             Оформить услугу
         </template>
@@ -18,8 +18,8 @@
 
         </template>
         <template v-slot:footer>
-            <AppButton class="btn-rounded btn-empty">Отменить</AppButton>
-            <AppButton class="btn-rounded btn-success text-white" @click="saveClient">Оформить</AppButton>
+            <AppButton class="btn-rounded btn-empty" @click="closeDialog">Отменить</AppButton>
+            <AppButton class="btn-rounded btn-success text-white" @click="saveService">Оформить</AppButton>
         </template>
     </FormBase>
 </template>
@@ -51,7 +51,9 @@ export default {
 
             clientId: null,
             clientSet: {
-                group_id: null
+                group_id: null,
+                ticket_id: null,
+                individual_id: null
             }
 
         }
@@ -77,9 +79,13 @@ export default {
             "GET_SERVICES",
             "GET_TICKETS"
         ]),
+        closeDialog(){
+            this.$emit('closeDialog')
+        },
 
-        saveClient() {
+        saveService() {
             this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientSet])
+            this.$emit('saveForm')
         }
     },
 
@@ -99,6 +105,15 @@ export default {
         group(group) {
             this.clientSet.group_id = group.id
             // console.log(this.clientSet.group_id);
+        },
+
+        ticket(ticket) {
+            this.clientSet.ticket_id = ticket.id
+            console.log(this.clientSet.ticket_id);
+        },
+        individual(individual) {
+            this.clientSet.individual_id = individual.id
+            // console.log(this.clientSet.ticket_id);
         }
     }
 }
