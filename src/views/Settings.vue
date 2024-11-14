@@ -48,7 +48,7 @@
           <FormInput lable="Дисконт, ₽ " type="number" v-model="ticketsList.ticketDiscount" />
           <div class="formResult-wrapper">
             <div class="formResult"><span>Стоимость абонемента</span><span class="formResult_number">{{
-                computedTicketCost }}</span></div>
+              computedTicketCost }}</span></div>
             <div class="formResult"><span>Стоимость занятия</span><span class="formResult_number">{{ computedVisitCost
                 }}</span>
             </div>
@@ -278,7 +278,7 @@ export default {
       this.isDeleteIndividualsDialog = true
     },
 
-    
+
     // удаление преподавателя из базы
 
     deleteIndividuals() {
@@ -327,7 +327,7 @@ export default {
 
     saveTicket() {
       this.$store.dispatch('SET_TICKETS', this.ticketsList)
-
+      this.ticketsList.ticketName = ''
       this.ticketsList.ticketCost = 0
       this.ticketsList.ticketDiscount = 0
       this.ticketsList.ticketVisits = 0
@@ -366,7 +366,7 @@ export default {
         this.isSaveDialogServices = false
         this.isOverScreen = false
 
-      } else if(this.currentItem == 'Абонементы') {
+      } else if (this.currentItem == 'Абонементы') {
         this.ticketsList.ticketCost = 0
         this.ticketsList.ticketDiscount = 0
         this.ticketsList.ticketVisits = 0
@@ -375,7 +375,7 @@ export default {
 
         this.isSaveDialogTickets = false
         this.isOverScreen = false
-      }else {
+      } else {
         this.isSaveDialogIndividuals = false
         this.isOverScreen = false
       }

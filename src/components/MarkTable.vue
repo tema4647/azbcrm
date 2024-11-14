@@ -136,7 +136,6 @@ export default {
     filterClients() {
       const filterClients = []
       if ('group_name' in this.currentGroupOrIndividual) {
-        // console.log(this.currentGroupOrIndividual);
         this.clientsWithDays.forEach((client) => {
           client.groups.forEach((group) => {
             if (group.group_name == this.currentGroupOrIndividual.group_name) {
@@ -146,9 +145,6 @@ export default {
         })
       }
       if ('individual_name' in this.currentGroupOrIndividual) {
-        // console.log(this.currentGroupOrIndividual);
-        
-        
         this.clientsWithDays.forEach((client) => {
           client.individuals.forEach((individual) => {
             if (individual.individual_name == this.currentGroupOrIndividual.individual_name) {

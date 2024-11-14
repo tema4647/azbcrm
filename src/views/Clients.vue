@@ -132,6 +132,8 @@ export default {
         group_id: null,
       },
 
+      
+
       // заголовки столбцов таблицы
       headers: [
         {
@@ -166,7 +168,7 @@ export default {
 
   computed: {
     searchClientsFilter(){
-      const searchList = this.CLIENTS.filter(clients => clients.client_child_fio.match( new RegExp(`${this.searchClient}`, 'gi')   || []))
+      const searchList = this.CLIENTS.filter(clients => clients.client_child_fio?.match( new RegExp(`${this.searchClient}`, 'gi')   || []))
       return searchList
     },
 

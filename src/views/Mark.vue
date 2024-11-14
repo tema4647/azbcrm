@@ -31,7 +31,7 @@
     <!-- диалог оплаты -->
     <transition name="fade">
       <FormBase v-if="isPaymentDialog" @closeDialog="closePaymentDialog">
-        
+
         <template v-slot:header>
           {{ clientSet.client_child_fio }} {{ currentClientDeposit }}
         </template>
@@ -108,6 +108,15 @@ export default {
         visitDate: null,
       },
 
+      transactionList: {
+        client_id: null,
+        transaction_type: '',
+        transaction_reason: '',
+        transaction_account: '',
+        transaction_amount: 0.00,
+        transaction_date: null
+      },
+
 
       // данные клиента
       clientSet: {
@@ -163,7 +172,7 @@ export default {
   computed: {
     currentSumm() {
       const result = +this.currentClientDeposit + +this.currentClientAmount
-      return  result.toFixed(2)
+      return result.toFixed(2)
     },
 
     ...mapGetters([
@@ -172,7 +181,8 @@ export default {
       "VISITS",
       "INDIVIDUALS",
       "SERVICES",
-      "TICKETS"
+      "TICKETS",
+      "TRANSACTIONS"
     ]),
   },
 
@@ -224,15 +234,15 @@ export default {
     },
 
     // определение item в "SelectionList"
-    selectItem([item ]) {
-      if(!item) return this.currentGroupOrIndividual = {}
+    selectItem([item]) {
+      if (!item) return this.currentGroupOrIndividual = {}
       if ('group_name' in item) {
-        this.currentGroupOrIndividual = item 
+        this.currentGroupOrIndividual = item
         this.group = item
       } else if ('individual_name' in item) {
-        this.currentGroupOrIndividual = item 
+        this.currentGroupOrIndividual = item
         this.individual = item
-      } 
+      }
     },
 
 
@@ -242,12 +252,25 @@ export default {
       this.clientSet.client_child_fio = client.client_child_fio;
       this.currentClientDeposit = client.client_parent_amount;
 
+      // транзакции
+      this.transactionList.client_id = client.id;
+      this.transactionList.transaction_type = 'зачисление',
+      this.transactionList.transaction_reason = 'поплнение счета',
+      this.transactionList.transaction_account = 'счет',
+      this.transactionList.transaction_date = '2024-01-01'
+
       this.isPaymentDialog = true
       this.isOverScreen = true
+
+
     },
 
     // внесение денежных средств
     savePayment() {
+      this.$store.dispatch('SET_TRANSACTIONS', this.transactionList)
+      this.transactionList.client_id = null;
+      this.transactionList.transaction_amount = 0.00;
+
       this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientSet])
       this.clientSet.client_child_fio = '';
       this.clientSet.client_child_birth = '';
@@ -287,14 +310,19 @@ export default {
       "GET_VISITS",
       "GET_INDIVIDUALS",
       "GET_SERVICES",
-      "GET_TICKETS"
+      "GET_TICKETS",
+      "GET_TRANSACTIONS"
     ]),
 
   },
 
   watch: {
+    currentClientAmount(currentClientAmount) {
+      this.transactionList.transaction_amount = currentClientAmount
+    },
+
+    // следим за изменением текушей суммы и добовляем в clientSet
     currentSumm() {
-      // следим за изменением текушей суммы и добовляем в clientSet
       this.clientSet.client_parent_amount = this.currentSumm
     },
   },
@@ -307,6 +335,7 @@ export default {
     this.GET_INDIVIDUALS()
     this.GET_SERVICES()
     this.GET_TICKETS()
+    this.GET_TRANSACTIONS()
   },
 
 }

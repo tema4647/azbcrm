@@ -5,6 +5,8 @@ import visits from '@/store/modules/visits'
 import services from '@/store/modules/services'
 import tickets from '@/store/modules/tickets'
 import individuals from '@/store/modules/individuals'
+import transactions from '@/store/modules/transactions'
+
 
 
 
@@ -26,6 +28,7 @@ export default createStore({
     visits,
     services,
     tickets,
-    individuals
+    individuals,
+    transactions
   }
 })
