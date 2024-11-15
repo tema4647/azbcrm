@@ -23,14 +23,14 @@
           Добавить клиента
         </template>
         <template #body>
-          <FormInput v-model="clientSet.client_child_fio" lable="Фамилия, Имя" type="text"
+          <FormInput v-model="clientsList.client_child_fio" lable="Фамилия, Имя" type="text"
             placeholder="Например, Репетун Иван" />
-          <FormInput v-model="clientSet.client_child_birth" lable="Дата рождения" type="date" placeholder="Выбрать" />
-          <FormInput v-model="clientSet.client_parent_fio" lable="Ф.И.О родителя" type="text"
+          <FormInput v-model="clientsList.client_child_birth" lable="Дата рождения" type="date" placeholder="Выбрать" />
+          <FormInput v-model="clientsList.client_parent_fio" lable="Ф.И.О родителя" type="text"
             placeholder="Например, Репетун Анна" />
-          <FormInput v-model="clientSet.client_parent_phone" lable="Телефон" type="text"
+          <FormInput v-model="clientsList.client_parent_phone" lable="Телефон" type="text"
             placeholder="Например, 89128807879" />
-          <FormInput v-model="clientSet.client_parent_email" lable="Email" type="text"
+          <FormInput v-model="clientsList.client_parent_email" lable="Email" type="text"
             placeholder="Например, tratata@yandex.ru" />
 
           <FormSelect v-model:select="selectedGroups" :options="GROUPS" optionFieldName="group_name" lable="Группа"></FormSelect>
@@ -50,14 +50,14 @@
           Обновить данные клиента
         </template>
         <template #body>
-          <FormInput v-model="clientSet.client_child_fio" lable="Фамилия, Имя" type="text"
+          <FormInput v-model="clientsList.client_child_fio" lable="Фамилия, Имя" type="text"
             placeholder="Например, Репетун Иван" />
-          <FormInput v-model="clientSet.client_child_birth" lable="Дата рождения" type="date" placeholder="Выбрать" />
-          <FormInput v-model="clientSet.client_parent_fio" lable="Ф.И.О родителя" type="text"
+          <FormInput v-model="clientsList.client_child_birth" lable="Дата рождения" type="date" placeholder="Выбрать" />
+          <FormInput v-model="clientsList.client_parent_fio" lable="Ф.И.О родителя" type="text"
             placeholder="Например, Репетун Анна" />
-          <FormInput v-model="clientSet.client_parent_phone" lable="Телефон" type="text"
+          <FormInput v-model="clientsList.client_parent_phone" lable="Телефон" type="text"
             placeholder="Например, 89128807879" />
-          <FormInput v-model="clientSet.client_parent_email" lable="Email" type="text"
+          <FormInput v-model="clientsList.client_parent_email" lable="Email" type="text"
             placeholder="Например, tratata@yandex.ru" />
         </template>
         <template #footer>
@@ -122,7 +122,17 @@ export default {
       selectedGroups: null,
 
       // данные клиента
-      clientSet: {
+      // clientSet: {
+      //   client_child_fio: '',
+      //   client_child_birth: null,
+      //   client_parent_fio: '',
+      //   client_parent_phone: null,
+      //   client_parent_email: '',
+      //   client_parent_amount: 0.00,
+      //   group_id: null,
+      // },
+
+      clientsList: {
         client_child_fio: '',
         client_child_birth: null,
         client_parent_fio: '',
@@ -210,26 +220,26 @@ export default {
     // закрытие диалога сохранения клиента
     closeSaveDialog() {
       this.selectedGroups = null;
-      this.clientSet.client_child_fio = '';
-      this.clientSet.client_child_birth = '';
-      this.clientSet.client_parent_fio = '';
-      this.clientSet.client_parent_phone = '';
-      this.clientSet.client_parent_email = '';
-      this.clientSet.group_id = '';
+      this.clientsList.client_child_fio = '';
+      this.clientsList.client_child_birth = '';
+      this.clientsList.client_parent_fio = '';
+      this.clientsList.client_parent_phone = '';
+      this.clientsList.client_parent_email = '';
+      this.clientsList.group_id = '';
       this.isSaveDialog = false;
       this.isOverScreen = false;
     },
 
     // сохранение клиента в базу
     saveClient() {
-      this.$store.dispatch('SET_CLIENTS', this.clientSet)
+      this.$store.dispatch('SET_CLIENTS', this.clientsList)
       this.selectedGroups = null;
-      this.clientSet.client_child_fio = '';
-      this.clientSet.client_child_birth = '';
-      this.clientSet.client_parent_fio = '';
-      this.clientSet.client_parent_phone = '';
-      this.clientSet.client_parent_email = '';
-      this.clientSet.group_id = '';
+      this.clientsList.client_child_fio = '';
+      this.clientsList.client_child_birth = '';
+      this.clientsList.client_parent_fio = '';
+      this.clientsList.client_parent_phone = '';
+      this.clientsList.client_parent_email = '';
+      this.clientsList.group_id = '';
       this.isSaveDialog = false;
       this.isOverScreen = false;
     },
@@ -237,12 +247,12 @@ export default {
     // открытие диалога обновления клиента
     openEditDialog(client){
       this.clientId = client.id;
-      this.clientSet.client_child_fio = client.client_child_fio;
-      this.clientSet.client_child_birth = client.client_child_birth;
-      this.clientSet.client_parent_fio = client.client_parent_fio;
-      this.clientSet.client_parent_phone = client.client_parent_phone;
-      this.clientSet.client_parent_email = client.client_parent_email;
-      this.clientSet.client_parent_amount = client.client_parent_amount;
+      this.clientsList.client_child_fio = client.client_child_fio;
+      this.clientsList.client_child_birth = client.client_child_birth;
+      this.clientsList.client_parent_fio = client.client_parent_fio;
+      this.clientsList.client_parent_phone = client.client_parent_phone;
+      this.clientsList.client_parent_email = client.client_parent_email;
+      this.clientsList.client_parent_amount = client.client_parent_amount;
       this.isEditDialog = true;
       this.isOverScreen = true;
 
@@ -256,12 +266,12 @@ export default {
 
     // обновление клиента в базе
     editClient() {
-      this.$store.dispatch('PUT_CLIENT', [this.clientId,  this.clientSet])
-      this.clientSet.client_child_fio = '';
-      this.clientSet.client_child_birth = '';
-      this.clientSet.client_parent_fio = '';
-      this.clientSet.client_parent_phone = '';
-      this.clientSet.client_parent_email = '';
+      this.$store.dispatch('PUT_CLIENT', [this.clientId,  this.clientsList])
+      this.clientsList.client_child_fio = '';
+      this.clientsList.client_child_birth = '';
+      this.clientsList.client_parent_fio = '';
+      this.clientsList.client_parent_phone = '';
+      this.clientsList.client_parent_email = '';
       this.isEditDialog = false;
       this.isOverScreen = false;
     },
@@ -296,7 +306,7 @@ export default {
   watch: {
     // следим за выбором группы
     selectedGroups() {
-      this.clientSet.group_id = this.selectedGroups?.id
+      this.clientsList.group_id = this.selectedGroups?.id
     },
   },
 

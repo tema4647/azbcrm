@@ -33,7 +33,7 @@
       <FormBase v-if="isPaymentDialog" @closeDialog="closePaymentDialog">
 
         <template v-slot:header>
-          {{ clientSet.client_child_fio }} {{ currentClientDeposit }}
+          {{ clientsList.client_child_fio }} {{ currentClientDeposit }}
         </template>
         <template v-slot:body>
           <FormInput v-model="currentClientAmount" lable="Сумма" type="number" placeholder="Введите сумму" />
@@ -66,7 +66,10 @@ import Popup from '@/components/Popup/Popup.vue'
 import FormSelect from '@/components/Form/FormSelect'
 
 
+import dayjs from 'dayjs'
+import dayjs_ru from 'dayjs/locale/ru.js'
 
+dayjs.locale('ru')
 
 
 export default {
@@ -94,6 +97,7 @@ export default {
       currentGroupOrIndividual: {},
       group: {},
       individual: {},
+      currentDate: dayjs().format('YYYY-MM-DD'),
       price: 500.00,
       currentClientAmount: 0.00,
       currentClientDeposit: 0.00,
@@ -119,7 +123,7 @@ export default {
 
 
       // данные клиента
-      clientSet: {
+      clientsList: {
         client_child_fio: '',
         client_child_birth: null,
         client_parent_fio: '',
@@ -129,8 +133,9 @@ export default {
         group_id: null,
       },
 
-      visitValue: {
+      visitList: {
         client_id: null,
+        service_id: null,
         visit_date: ''
       },
 
@@ -219,16 +224,30 @@ export default {
         // определяем текущую стоимость списания в зависимости есть ли абонемент или нет, если абонемент есть спишется стоимость по абонементу, если нет спишеться стоимость услуги.
         const currentValue = currentTicketCost ? currentTicketCost : currentServiceCost
 
-        this.visitValue.client_id = client.id
-        this.visitValue.visit_date = cell.day
 
-        await this.$store.dispatch('SET_VISITS', this.visitValue)
+        // посещения
+        this.visitList.client_id = client.id
+        this.visitList.visit_date = cell.day
+        this.visitList.service_id = currentGroupOrIndividual.services.id
 
-        const result = client.client_parent_amount - currentValue
 
+        // транзакции
+        this.transactionList.client_id = client.id;
+        this.transactionList.transaction_type = 'списание',
+        this.transactionList.transaction_reason = 'оплата за услугу',
+        this.transactionList.transaction_account = currentTickets ? 'абонемент' : 'счет',
+        this.transactionList.transaction_amount = currentValue;
+        this.transactionList.transaction_date = this.currentDate
+
+        await this.$store.dispatch('SET_TRANSACTIONS', this.transactionList)
+
+        await this.$store.dispatch('SET_VISITS', this.visitList)
+
+        const result = +client.client_parent_amount - +currentValue
         this.clientId = client.id;
-        this.clientSet.client_parent_amount = result;
-        this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientSet])
+        this.clientsList.client_parent_amount = result.toFixed(2);
+
+        this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
       }
 
     },
@@ -249,7 +268,7 @@ export default {
     // открытие диалога оплаты
     openPaymentDialog(client) {
       this.clientId = client.id;
-      this.clientSet.client_child_fio = client.client_child_fio;
+      this.clientsList.client_child_fio = client.client_child_fio;
       this.currentClientDeposit = client.client_parent_amount;
 
       // транзакции
@@ -257,7 +276,7 @@ export default {
       this.transactionList.transaction_type = 'зачисление',
       this.transactionList.transaction_reason = 'поплнение счета',
       this.transactionList.transaction_account = 'счет',
-      this.transactionList.transaction_date = '2024-01-01'
+      this.transactionList.transaction_date = this.currentDate
 
       this.isPaymentDialog = true
       this.isOverScreen = true
@@ -271,13 +290,13 @@ export default {
       this.transactionList.client_id = null;
       this.transactionList.transaction_amount = 0.00;
 
-      this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientSet])
-      this.clientSet.client_child_fio = '';
-      this.clientSet.client_child_birth = '';
-      this.clientSet.client_parent_fio = '';
-      this.clientSet.client_parent_phone = '';
-      this.clientSet.client_parent_email = '';
-      this.clientSet.group_id = '';
+      this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
+      this.clientsList.client_child_fio = '';
+      this.clientsList.client_child_birth = '';
+      this.clientsList.client_parent_fio = '';
+      this.clientsList.client_parent_phone = '';
+      this.clientsList.client_parent_email = '';
+      this.clientsList.group_id = '';
 
       this.currentClientAmount = 0.00;
       this.currentClientDeposit = 0.00;
@@ -323,7 +342,7 @@ export default {
 
     // следим за изменением текушей суммы и добовляем в clientSet
     currentSumm() {
-      this.clientSet.client_parent_amount = this.currentSumm
+      this.clientsList.client_parent_amount = this.currentSumm
     },
   },
 

@@ -33,10 +33,11 @@ export default {
       })
      },
 
-     SET_VISITS({commit}, visitValue ){
+     SET_VISITS({commit}, visitList ){
       return axios.post('http://127.0.0.1:8000/api/v1/visits', {
-        client_id: visitValue.client_id,
-        visit_date: visitValue.visit_date,
+        client_id: visitList.client_id,
+        visit_date: visitList.visit_date,
+        service_id: visitList.service_id
       }
      )
      .then((visits) =>{

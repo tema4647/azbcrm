@@ -34,16 +34,16 @@ export default {
         })
     },
 
-    SET_CLIENTS({ commit }, clientSet) {
+    SET_CLIENTS({ commit }, clientsList) {
         return axios
           .post('http://127.0.0.1:8000/api/v1/clients', {
-            client_child_fio: clientSet.client_child_fio,
-            client_child_birth: clientSet.client_child_birth,
-            client_parent_fio: clientSet.client_parent_fio,
-            client_parent_phone: clientSet.client_parent_phone,
-            client_parent_email: clientSet.client_parent_email,
-            client_parent_amount: clientSet.client_parent_amount,
-            group_id: clientSet.group_id,
+            client_child_fio: clientsList.client_child_fio,
+            client_child_birth: clientsList.client_child_birth,
+            client_parent_fio: clientsList.client_parent_fio,
+            client_parent_phone: clientsList.client_parent_phone,
+            client_parent_email: clientsList.client_parent_email,
+            client_parent_amount: clientsList.client_parent_amount,
+            group_id: clientsList.group_id,
           })
           .then((clients) => {
             commit('ADD_CLIENT', clients.data)
@@ -51,18 +51,18 @@ export default {
      
     },
 
-    PUT_CLIENT({ commit }, [clientId, clientSet]) {
+    PUT_CLIENT({ commit }, [clientId, clientsList]) {
       return axios
         .put(`http://127.0.0.1:8000/api/v1/clients/${clientId}`, {
-          client_child_fio: clientSet.client_child_fio,
-          client_child_birth: clientSet.client_child_birth,
-          client_parent_fio: clientSet.client_parent_fio,
-          client_parent_phone: clientSet.client_parent_phone,
-          client_parent_email: clientSet.client_parent_email,
-          client_parent_amount: clientSet.client_parent_amount,
-          individual_id: clientSet.individual_id,
-          group_id: clientSet.group_id,
-          ticket_id: clientSet.ticket_id,
+          client_child_fio: clientsList.client_child_fio,
+          client_child_birth: clientsList.client_child_birth,
+          client_parent_fio: clientsList.client_parent_fio,
+          client_parent_phone: clientsList.client_parent_phone,
+          client_parent_email: clientsList.client_parent_email,
+          client_parent_amount: clientsList.client_parent_amount,
+          individual_id: clientsList.individual_id,
+          group_id: clientsList.group_id,
+          ticket_id: clientsList.ticket_id,
           
         })
         .then((clients) => {

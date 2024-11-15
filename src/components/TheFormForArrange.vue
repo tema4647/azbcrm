@@ -48,14 +48,12 @@ export default {
             ticket: null,
             individual: null,
             group: null,
-
             clientId: null,
-            clientSet: {
+            clientsList: {
                 group_id: null,
                 ticket_id: null,
                 individual_id: null
             }
-
         }
     },
 
@@ -79,12 +77,12 @@ export default {
             "GET_SERVICES",
             "GET_TICKETS"
         ]),
-        closeDialog(){
+        closeDialog() {
             this.$emit('closeDialog')
         },
 
         saveService() {
-            this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientSet])
+            this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
             this.$emit('saveForm')
         }
     },
@@ -99,21 +97,16 @@ export default {
     watch: {
         client(client) {
             this.clientId = client.id
-            // console.log(this.clientId);
-
         },
         group(group) {
-            this.clientSet.group_id = group.id
-            // console.log(this.clientSet.group_id);
+            this.clientsList.group_id = group.id
         },
 
         ticket(ticket) {
-            this.clientSet.ticket_id = ticket.id
-            console.log(this.clientSet.ticket_id);
+            this.clientsList.ticket_id = ticket.id
         },
         individual(individual) {
-            this.clientSet.individual_id = individual.id
-            // console.log(this.clientSet.ticket_id);
+            this.clientsList.individual_id = individual.id
         }
     }
 }

@@ -21,13 +21,13 @@
           Добавить группу
         </template>
         <template #body>
-          <FormInput v-model="groupList.groupName" lable="Название группы" type="text"
+          <FormInput v-model="groupsList.groupName" lable="Название группы" type="text"
             placeholder="Например, Радость" />
           <FormSelect v-model:select="selectedServices" :options="SERVICES" optionFieldName="service_name" lable="Услуга" />
         </template>
         <template #footer>
           <AppButton class="btn-rounded btn-success btn-empty" @click="closeSaveDialog">Отменить</AppButton>
-          <AppButton :disabled="groupList.groupName && groupList.serviceId ? false : true"
+          <AppButton :disabled="groupsList.groupName && groupsList.serviceId ? false : true"
             class="btn-rounded btn-success text-white" @click.prevent="saveGroup">Сохранить</AppButton>
         </template>
       </FormBase>
@@ -88,7 +88,7 @@ export default {
       searchGroup: '',
       groupId: "",
       group: "",
-      groupList: {
+      groupsList: {
         groupName: "",
         serviceId: null
       },
@@ -130,8 +130,8 @@ export default {
 
     // открытие диалога сохранения группы
     openSaveDialog() {
-      this.groupList.groupName = ""
-      this.groupList.serviceId = null
+      this.groupsList.groupName = ""
+      this.groupsList.serviceId = null
       this.selectedServices = null
       this.isSaveDialog = true
       this.isOverScreen = true
@@ -145,12 +145,12 @@ export default {
 
     // сохранение группы в базу
     saveGroup() {
-      if (this.groupList.groupName !== '') {
-        this.$store.dispatch("SET_GROUPS", this.groupList)
+      if (this.groupsList.groupName !== '') {
+        this.$store.dispatch("SET_GROUPS", this.groupsList)
         this.isSaveDialog = false
         this.isOverScreen = false
-        this.groupList.groupName = ""
-        this.groupList.serviceId = null
+        this.groupsList.groupName = ""
+        this.groupsList.serviceId = null
         this.selectedServices = null
       }
     },
@@ -192,7 +192,7 @@ export default {
 
   watch: {
     selectedServices() {
-      this.groupList.serviceId = this.selectedServices?.id
+      this.groupsList.serviceId = this.selectedServices?.id
     }
   }
 
