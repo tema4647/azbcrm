@@ -45,9 +45,6 @@
           </div>
         </div>
       </div>
-
-
-
     </div>
   </AppBase>
 </template>
@@ -119,16 +116,29 @@ export default {
           })
         })
         // вычисляем отмеченые дни
-        for (const visit of client.visits) {
-          client.days.map((day) => {
-            if (day.day == visit.visit_date) {
-              day.isMarked = true
-            }
-            return day
-          })
+        if (this.currentGroupOrIndividual.group_name) {
+          for (const visit of client.visits) {
+            client.days.map((day) => {
+              if (day.day == visit.visit_date && visit.groups?.group_name == this.currentGroupOrIndividual.group_name) {
+                day.isMarked = true
+              }
+              return day
+            })
+          } 
+        } else if(this.currentGroupOrIndividual.individual_name){
+          for (const visit of client.visits) {
+            client.days.map((day) => {
+              if (day.day == visit.visit_date && visit.individuals?.individual_name == this.currentGroupOrIndividual.individual_name) {
+                day.isMarked = true
+              }
+              return day
+            })
+          } 
         }
+
         clientsWithDays.push(client)
       }
+
       return clientsWithDays
     },
 

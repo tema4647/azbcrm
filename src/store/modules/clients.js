@@ -35,23 +35,24 @@ export default {
     },
 
     SET_CLIENTS({ commit }, clientsList) {
-        return axios
-          .post('http://127.0.0.1:8000/api/v1/clients', {
-            client_child_fio: clientsList.client_child_fio,
-            client_child_birth: clientsList.client_child_birth,
-            client_parent_fio: clientsList.client_parent_fio,
-            client_parent_phone: clientsList.client_parent_phone,
-            client_parent_email: clientsList.client_parent_email,
-            client_parent_amount: clientsList.client_parent_amount,
-            group_id: clientsList.group_id,
-          })
-          .then((clients) => {
-            commit('ADD_CLIENT', clients.data)
-          })
-     
+      
+      return axios
+        .post('http://127.0.0.1:8000/api/v1/clients', {
+          client_child_fio: clientsList.client_child_fio,
+          client_child_birth: clientsList.client_child_birth,
+          client_parent_fio: clientsList.client_parent_fio,
+          client_parent_phone: clientsList.client_parent_phone,
+          client_parent_email: clientsList.client_parent_email,
+          client_parent_amount: clientsList.client_parent_amount,
+          group_id: clientsList.group_id,
+        })
+        .then((clients) => {
+          commit('ADD_CLIENT', clients.data)
+        })
     },
 
     PUT_CLIENT({ commit }, [clientId, clientsList]) {
+
       return axios
         .put(`http://127.0.0.1:8000/api/v1/clients/${clientId}`, {
           client_child_fio: clientsList.client_child_fio,
@@ -63,7 +64,10 @@ export default {
           individual_id: clientsList.individual_id,
           group_id: clientsList.group_id,
           ticket_id: clientsList.ticket_id,
-          
+          ticket_count: clientsList.ticket_count,
+          ticket_current_amount: clientsList.ticket_current_amount,
+          sync: clientsList.sync,
+          detach: clientsList.detach
         })
         .then((clients) => {
           commit('UPDATE_CLIENT', clients.data)

@@ -54,10 +54,12 @@
                             <div class="part-item__title border-bottom">Абонементы</div>
                             <div class="flex-row tickets" v-for="ticket in client.tickets" :key="ticket.id">
                                 <div class="part-item__value"> {{ ticket.ticket_name }}</div>
-                                <div class="part-item__value"> {{ ticket.ticket_cost }}</div>
+                                <div class="part-item__value"> {{ ticket.ticket_cost }}\{{ ticket.ticket_current_amount
+                                    }}</div>
                                 <div class="part-item__value"> {{ ticket.visit_cost }}</div>
                                 <div class="part-item__value"> {{ ticket.ticket_discount }}</div>
-                                <div class="part-item__value"> {{ ticket.ticket_visits }}</div>
+                                <div class="part-item__value"> {{ ticket.ticket_visits }}\{{ ticket.ticket_count }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -65,10 +67,13 @@
 
                 <div class="clientData__part-wrapper">
                     <div class="part-title border-bottom">Посещения</div>
-                    <div class="part-item__wrapper"><div class="part-item flex-column">
+                    <div class="part-item__wrapper">
+                        <div class="part-item flex-column">
                             <div class="flex-row tickets" v-for="visit in client.visits" :key="visit.id">
-                                <div class="part-item__value">{{ visit.visit_date }}</div>
+                                <div class="part-item__value">{{ visit.groups?.group_name ||
+                                    visit.individuals?.individual_name }}</div>
                                 <div class="part-item__value">{{ visit.services.service_name }}</div>
+                                <div class="part-item__value">{{ visit.visit_date }}</div>
                             </div>
                         </div>
                     </div>
@@ -84,14 +89,16 @@
                     </div>
                     <div class="part-item flex-row space-between">
                         <div class="part-item__title border-bottom">Деньги в абонементах</div>
-                        <div class="part-item__value">7000 руб.</div>
+                        <div class="part-item__value">{{ ticketAmountReduce }} руб.</div>
                     </div>
                 </div>
 
                 <div class="clientData__part-wrapper">
                     <div class="part-title border-bottom">Поступления, списания, возвраты</div>
-                    <div class="part-item__wrapper"><div class="part-item flex-column">
-                            <div class="flex-row tickets" v-for="transaction in client.transactions" :key="transaction.id">
+                    <div class="part-item__wrapper">
+                        <div class="part-item flex-column">
+                            <div class="flex-row tickets" v-for="transaction in client.transactions"
+                                :key="transaction.id">
                                 <div class="part-item__value">{{ transaction.transaction_type }}</div>
                                 <div class="part-item__value">{{ transaction.transaction_reason }}</div>
                                 <div class="part-item__value">{{ transaction.transaction_account }}</div>
@@ -122,6 +129,24 @@ export default {
         }
     },
 
+    data() {
+        return {
+
+        }
+    },
+
+    computed: {
+        ticketAmountReduce() {
+            const tickets = this.client.tickets.map(tickets => tickets)
+            const ticketAmountReduce = tickets.reduce((acc, arr) => {
+                return acc + arr.ticket_current_amount
+            }, 0)
+
+            return ticketAmountReduce
+        },
+
+    },
+
     methods: {
         handleClick() {
             this.$emit('closeClientData')
@@ -147,7 +172,7 @@ export default {
     transform: translateY(-50%);
     display: grid;
     grid-auto-rows: minmax(50px, auto);
-    
+
 }
 
 .clientData__header {

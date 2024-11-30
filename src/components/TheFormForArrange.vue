@@ -52,7 +52,9 @@ export default {
             clientsList: {
                 group_id: null,
                 ticket_id: null,
-                individual_id: null
+                individual_id: null,
+                ticket_count: null,
+                ticket_current_amount: null,
             }
         }
     },
@@ -83,6 +85,7 @@ export default {
 
         saveService() {
             this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
+
             this.$emit('saveForm')
         }
     },
@@ -104,6 +107,8 @@ export default {
 
         ticket(ticket) {
             this.clientsList.ticket_id = ticket.id
+            this.clientsList.ticket_count = ticket.ticket_visits
+            this.clientsList.ticket_current_amount = ticket.ticket_cost
         },
         individual(individual) {
             this.clientsList.individual_id = individual.id

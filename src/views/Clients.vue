@@ -121,16 +121,6 @@ export default {
       clientId: null,
       selectedGroups: null,
 
-      // данные клиента
-      // clientSet: {
-      //   client_child_fio: '',
-      //   client_child_birth: null,
-      //   client_parent_fio: '',
-      //   client_parent_phone: null,
-      //   client_parent_email: '',
-      //   client_parent_amount: 0.00,
-      //   group_id: null,
-      // },
 
       clientsList: {
         client_child_fio: '',
@@ -225,7 +215,7 @@ export default {
       this.clientsList.client_parent_fio = '';
       this.clientsList.client_parent_phone = '';
       this.clientsList.client_parent_email = '';
-      this.clientsList.group_id = '';
+      this.clientsList.group_id = null;
       this.isSaveDialog = false;
       this.isOverScreen = false;
     },

@@ -131,11 +131,18 @@ export default {
         client_parent_email: '',
         client_parent_amount: 0.00,
         group_id: null,
+        ticket_id: null,
+        ticket_count: null,
+        ticket_current_amount: null,
+        sync: true,
+        detach: false
       },
 
       visitList: {
         client_id: null,
         service_id: null,
+        group_id: null,
+        individual_id: null,
         visit_date: ''
       },
 
@@ -210,33 +217,43 @@ export default {
 
     // отметка посешения и списания денег со счета
     async toggleMark([client, cell, currentGroupOrIndividual]) {
-
       if (cell.isMarked) {
         alert('Повторная отметка посещения невозможна')
       } else {
 
         // проверяем есть ли абонементы у клиента 
-        const [currentTickets] = client.tickets.lenght != 0 ? client.tickets : undefined
+        const currentTickets = client.tickets.lenght != 0 ? client.tickets : undefined
         // проверяем есть ли абонемент на услугу, если есть определяем стоимость списания по абонементу
-        const currentTicketCost = currentTickets?.service_id == currentGroupOrIndividual.service_id ? currentTickets.visit_cost : undefined
-        // определяем стоимость услуги в зависимости от груповых или индивидуальных занятий
-        const [currentServiceCost] = 'group_name' in currentGroupOrIndividual ? client?.groups.map(group => group?.services.service_cost) : client?.individuals.map(individual => individual?.services.service_cost)
-        // определяем текущую стоимость списания в зависимости есть ли абонемент или нет, если абонемент есть спишется стоимость по абонементу, если нет спишеться стоимость услуги.
-        const currentValue = currentTicketCost ? currentTicketCost : currentServiceCost
+        const [currentTicket] = currentTickets.filter(ticket => ticket?.service_id == currentGroupOrIndividual.service_id)
+        const currentTicketCost = currentTicket?.visit_cost
 
+        // определяем стоимость услуги в зависимости от груповых или индивидуальных занятий
+        let currentServiceCost;
+        if ('group_name' in currentGroupOrIndividual) {
+          const [currentGroup] = client?.groups.filter(group => group.group_name == currentGroupOrIndividual.group_name)
+          currentServiceCost = currentGroup.services.service_cost
+        } else if ('individual_name' in currentGroupOrIndividual) {
+          const [currentIndividual] = client?.individuals.filter(individual => individual.individual_name == currentGroupOrIndividual.individual_name)
+          currentServiceCost = currentIndividual.services.service_cost
+        }
+
+        // определяем текущую стоимость списания в зависимости есть ли абонемент или нет, если абонемент есть спишется стоимость по абонементу, если нет спишеться стоимость услуги.
+        const currentValue = currentTicketCost ? 0 : currentServiceCost
 
         // посещения
         this.visitList.client_id = client.id
         this.visitList.visit_date = cell.day
         this.visitList.service_id = currentGroupOrIndividual.services.id
+        this.visitList.group_id = 'group_name' in currentGroupOrIndividual ? currentGroupOrIndividual.id : null
+        this.visitList.individual_id = 'individual_name' in currentGroupOrIndividual ? currentGroupOrIndividual.id : null
 
 
         // транзакции
         this.transactionList.client_id = client.id;
         this.transactionList.transaction_type = 'списание',
-        this.transactionList.transaction_reason = 'оплата за услугу',
-        this.transactionList.transaction_account = currentTickets ? 'абонемент' : 'счет',
-        this.transactionList.transaction_amount = currentValue;
+          this.transactionList.transaction_reason = 'оплата за услугу',
+          this.transactionList.transaction_account = currentTicket ? 'абонемент' : 'счет',
+          this.transactionList.transaction_amount = currentValue ? currentValue : currentTicket?.visit_cost;
         this.transactionList.transaction_date = this.currentDate
 
         await this.$store.dispatch('SET_TRANSACTIONS', this.transactionList)
@@ -247,7 +264,23 @@ export default {
         this.clientId = client.id;
         this.clientsList.client_parent_amount = result.toFixed(2);
 
-        this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
+        // меняем данные в сводной таблице 
+        if (currentTicket?.ticket_count != 0) {
+          this.clientsList.ticket_id = currentTicket?.id
+          this.clientsList.ticket_count = currentTicket?.ticket_count - 1
+          this.clientsList.ticket_current_amount = currentTicket?.ticket_current_amount - currentTicketCost
+
+          this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
+        }
+
+
+        // удаляем запись/абонемент в сводной таблице
+        if (currentTicket?.ticket_count <= 1) {
+          this.clientsList.ticket_id = currentTicket?.id
+          this.clientsList.detach = true
+          this.clientsList.sync = false
+          this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
+        }
       }
 
     },
@@ -274,9 +307,9 @@ export default {
       // транзакции
       this.transactionList.client_id = client.id;
       this.transactionList.transaction_type = 'зачисление',
-      this.transactionList.transaction_reason = 'поплнение счета',
-      this.transactionList.transaction_account = 'счет',
-      this.transactionList.transaction_date = this.currentDate
+        this.transactionList.transaction_reason = 'поплнение счета',
+        this.transactionList.transaction_account = 'счет',
+        this.transactionList.transaction_date = this.currentDate
 
       this.isPaymentDialog = true
       this.isOverScreen = true
@@ -285,8 +318,8 @@ export default {
     },
 
     // внесение денежных средств
-    savePayment() {
-      this.$store.dispatch('SET_TRANSACTIONS', this.transactionList)
+    async savePayment() {
+      await this.$store.dispatch('SET_TRANSACTIONS', this.transactionList)
       this.transactionList.client_id = null;
       this.transactionList.transaction_amount = 0.00;
 

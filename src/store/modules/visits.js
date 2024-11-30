@@ -37,7 +37,9 @@ export default {
       return axios.post('http://127.0.0.1:8000/api/v1/visits', {
         client_id: visitList.client_id,
         visit_date: visitList.visit_date,
-        service_id: visitList.service_id
+        service_id: visitList.service_id,
+        group_id: visitList.group_id,
+        individual_id: visitList.individual_id
       }
      )
      .then((visits) =>{

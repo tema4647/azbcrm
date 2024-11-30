@@ -376,6 +376,8 @@ export default {
         this.isSaveDialogTickets = false
         this.isOverScreen = false
       } else {
+        this.individualsList.individualName = ''
+        this.individualsList.service_id = null
         this.isSaveDialogIndividuals = false
         this.isOverScreen = false
       }
