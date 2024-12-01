@@ -7,7 +7,7 @@
     <!-- незабыть переписать selectionList в динамику, SelectionList2 временый вариант  -->
     <SelectionList2 :business="BUSINESS" @select="selectItem" />
     <!-- таблица -->
-    <DataTable :headers="currentHeaders" :items="currentListItem" @deleteItem="openDeleteIndividualsDialog">
+    <DataTable :headers="currentHeaders" :items="currentListItem" @deleteItem="openConfirmationDialog">
       <template #header>
         <AppButton class="btn-success btn-rounded text-white" @click="openSaveDialog">
           Добавить
@@ -53,13 +53,31 @@
                 }}</span>
             </div>
           </div>
-
-
         </template>
         <template #footer>
           <AppButton class="btn-rounded btn-empty" @click.prevent="closeSaveDialog">Отменить</AppButton>
           <AppButton :disabled="!Object.values(ticketsList).every(item => item)"
             class="btn-rounded btn-success text-white" @click.prevent="saveTicket">Сохранить</AppButton>
+        </template>
+      </FormBase>
+    </transition>
+
+    <!-- диалог сохранения группы в базу -->
+    <transition name="fade">
+      <FormBase class="baseDialogPlace" v-if="isSaveDialogGroups" @closeDialog="closeSaveDialog">
+        <template #header>
+          Добавить группу
+        </template>
+        <template #body>
+          <FormInput v-model="groupsList.groupName" lable="Название группы" type="text"
+            placeholder="Например, Радость" />
+          <FormSelect v-model:select="selectedServicesForGroup" :options="SERVICES" optionFieldName="service_name"
+            lable="Услуга" />
+        </template>
+        <template #footer>
+          <AppButton class="btn-rounded btn-success btn-empty" @click="closeSaveDialog">Отменить</AppButton>
+          <AppButton :disabled="groupsList.groupName && groupsList.serviceId ? false : true"
+            class="btn-rounded btn-success text-white" @click.prevent="saveGroup">Сохранить</AppButton>
         </template>
       </FormBase>
     </transition>
@@ -72,7 +90,7 @@
         </template>
         <template #body>
           <FormInput lable="Ф.И.О" type="text" v-model="individualsList.individualName" />
-          <FormSelect v-model:select="selectedServicesForIndividuals" :options="SERVICES" optionFieldName="service_name"
+          <FormSelect v-model:select="selectedServicesForIndividual" :options="SERVICES" optionFieldName="service_name"
             lable="Услуга"></FormSelect>
         </template>
         <template #footer>
@@ -83,9 +101,27 @@
       </FormBase>
     </transition>
 
+    <!-- диалог удаления группы из базы -->
+    <transition name="fade">
+      <FormBase class="baseDialogPlace" v-if="isDeleteGroupDialog" @closeDialog="closeConfirmationDialog">
+        <template #header>
+          Удалить группу
+        </template>
+        <template #body>
+          <p style="font-size: 14px; line-height: 22px;">Вы действительно хотите удалить группу <strong
+              style="font-size: 18px"> "{{ group.group_name }}" </strong> и все ее данные? <br>
+            После удаления восстановить их будет невозможно.</p>
+        </template>
+        <template #footer>
+          <AppButton class="btn-rounded btn-success btn-empty" @click="closeConfirmationDialog">Отменить</AppButton>
+          <AppButton class="btn-rounded btn-danger text-white" @click.prevent="deleteGroup">Удалить</AppButton>
+        </template>
+      </FormBase>
+    </transition>
+
     <!-- диалог удаления преподавателя из базы -->
     <transition name="fade">
-      <FormBase class="baseDialogPlace" v-if="isDeleteIndividualsDialog" @closeDialog="closeConfirmationDialog">
+      <FormBase class="baseDialogPlace" v-if="isDeleteIndividualDialog" @closeDialog="closeConfirmationDialog">
         <template #header>
           Удалить преподавателя
         </template>
@@ -136,21 +172,22 @@ export default {
     return {
       isSaveDialogTickets: false,
       isSaveDialogServices: false,
+      isSaveDialogGroups: false,
       isSaveDialogIndividuals: false,
-      isDeleteIndividualsDialog: false,
-
+      isDeleteGroupDialog: false,
+      isDeleteIndividualDialog: false,
       isOverScreen: false,
       selectedServicesForTicket: null,
-      selectedServicesForIndividuals: null,
+      selectedServicesForIndividual: null,
+      selectedServicesForGroup: null,
       individual: null,
+      group: null,
+      currentItem: 'Услуги',
+      currentDeleteItem: null,
+
       servicesList: {
         serviceName: '',
         serviceCost: 0,
-      },
-
-      individualsList: {
-        individualName: '',
-        service_id: null,
       },
 
       ticketsList: {
@@ -162,8 +199,18 @@ export default {
         visitCost: 0
       },
 
-      currentItem: 'Услуги',
+      groupsList: {
+        groupName: "",
+        serviceId: null
+      },
 
+      individualsList: {
+        individualName: '',
+        service_id: null,
+      },
+
+
+      // заголовки таблицы
       headersServices: [
         {
           key: 'service_name',
@@ -175,7 +222,6 @@ export default {
         },
 
       ],
-
 
       headersTickets: [
         {
@@ -201,7 +247,22 @@ export default {
 
       ],
 
-      headersindividuals: [
+      headersGroups: [
+        {
+          key: 'group_name',
+          label: 'Группа'
+        },
+        {
+          key: 'service_name',
+          label: 'Услуга'
+        },
+        {
+          key: 'quantity',
+          label: 'Кол-во'
+        },
+      ],
+
+      headersIndividuals: [
         {
           key: 'individual_name',
           label: 'Ф.И.О'
@@ -212,7 +273,8 @@ export default {
       BUSINESS: [
         { id: 1, group_name: 'Услуги' },
         { id: 2, group_name: 'Абонементы' },
-        { id: 3, group_name: 'Преподаватели' },
+        { id: 3, group_name: 'Группы' },
+        { id: 4, group_name: 'Индивидуалы' },
       ],
 
 
@@ -236,92 +298,67 @@ export default {
     },
 
 
-
     computedVisitCost() {
       if (!this.ticketsList.ticketVisits) return undefined
       const currentVisitCost = this.computedTicketCost / this.ticketsList.ticketVisits
       return Math.round(currentVisitCost ? currentVisitCost : '')
     },
 
-    currentListItem() {
-      if (this.currentItem == 'Услуги') {
-        return this.SERVICES
-      } else if (this.currentItem == 'Абонементы') {
-        return this.TICKETS
-      } else {
-        return this.INDIVIDUALS
-
+    // заголовки таблицы
+    currentHeaders() {
+      switch (this.currentItem) {
+        case 'Услуги': return this.headersServices
+        case 'Абонементы': return this.headersTickets
+        case 'Группы': return this.headersGroups
+        case 'Индивидуалы': return this.headersIndividuals
       }
     },
 
-    currentHeaders() {
-      if (this.currentItem == 'Услуги') {
-        return this.headersServices
-      } else if (this.currentItem == 'Абонементы') {
-        return this.headersTickets
-      } else {
-        return this.headersindividuals
+    // данные таблицы
+    currentListItem() {
+      switch (this.currentItem) {
+        case 'Услуги': return this.SERVICES
+        case 'Абонементы': return this.TICKETS
+        case 'Группы': return this.GROUPS
+        case 'Индивидуалы': return this.INDIVIDUALS
       }
     },
 
     ...mapGetters([
       'SERVICES',
       'TICKETS',
-      'INDIVIDUALS'
+      'INDIVIDUALS',
+      "GROUPS"
     ])
   },
 
   methods: {
 
-    openDeleteIndividualsDialog(individual) {
-      this.individual = individual
-      this.isDeleteIndividualsDialog = true
-    },
-
-
-    // удаление преподавателя из базы
-
-    deleteIndividuals() {
-      this.$store.dispatch("DELETE_INDIVIDUAL", this.individual.id);
-      this.isDeleteIndividualsDialog = false;
-      this.isOverScreen = false;
-    },
-
-
     selectItem(item) {
       this.currentItem = item
     },
-
 
     saveService() {
       this.$store.dispatch('SET_SERVICES', this.servicesList)
       this.servicesList.serviceName = ''
       this.servicesList.serviceCost = 0
-      if (this.currentItem == 'Услуги') {
-        this.isSaveDialogServices = false
-        this.isOverScreen = false
-
-      } else {
-        this.isSaveDialogTickets = false
-        this.isOverScreen = false
-      }
-
-    },
-
-    saveIndividual() {
-      this.$store.dispatch('SET_INDIVIDUALS', this.individualsList)
-      this.individualsList.individualName = ''
-      this.individualsList.service_id = null
-      if (this.currentItem == 'Услуги') {
-        this.isSaveDialogServices = false
-        this.isOverScreen = false
-
-      } else if (this.currentItem == 'Абонементы') {
-        this.isSaveDialogTickets = false
-        this.isOverScreen = false
-      } else {
-        this.isSaveDialogIndividuals = false
-        this.isOverScreen = false
+      switch (this.currentItem) {
+        case 'Услуги':
+          this.isSaveDialogServices = false
+          this.isOverScreen = false
+          break
+        case 'Абонементы':
+          this.isSaveDialogTickets = false
+          this.isOverScreen = false
+          break
+        case 'Группы':
+          this.isSaveDialogGroups = false
+          this.isOverScreen = false
+          break
+        case 'Индивидуалы':
+          this.isSaveDialogIndividuals = false
+          this.isOverScreen = false
+          break
       }
     },
 
@@ -332,74 +369,210 @@ export default {
       this.ticketsList.ticketDiscount = 0
       this.ticketsList.ticketVisits = 0
       this.ticketsList.service_id = null
-      this.selectedServices = null
-      if (this.currentItem == 'Услуги') {
-        this.isSaveDialogServices = false
-        this.isOverScreen = false
+      this.selectedServicesForTicket = null
+      switch (this.currentItem) {
+        case 'Услуги':
+          this.isSaveDialogServices = false
+          this.isOverScreen = false
+          break
+        case 'Абонементы':
+          this.isSaveDialogTickets = false
+          this.isOverScreen = false
+          break
+        case 'Группы':
+          this.isSaveDialogGroups = false
+          this.isOverScreen = false
+          break
+        case 'Индивидуалы':
+          this.isSaveDialogIndividuals = false
+          this.isOverScreen = false
+          break
+      }
+    },
 
-      } else {
-        this.isSaveDialogTickets = false
-        this.isOverScreen = false
+    saveGroup() {
+      if (this.groupsList.groupName !== '') {
+        this.$store.dispatch("SET_GROUPS", this.groupsList)
+        this.groupsList.groupName = ''
+        this.groupsList.serviceId = null
+        this.selectedServicesForGroup = null
+        switch (this.currentItem) {
+          case 'Услуги':
+            this.isSaveDialogServices = false
+            this.isOverScreen = false
+            break
+          case 'Абонементы':
+            this.isSaveDialogTickets = false
+            this.isOverScreen = false
+            break
+          case 'Группы':
+            this.isSaveDialogGroups = false
+            this.isOverScreen = false
+            break
+          case 'Индивидуалы':
+            this.isSaveDialogIndividuals = false
+            this.isOverScreen = false
+            break
+        }
+      }
+    },
+
+    saveIndividual() {
+      this.$store.dispatch('SET_INDIVIDUALS', this.individualsList)
+      this.individualsList.individualName = ''
+      this.individualsList.service_id = null
+      this.selectedServicesForIndividual = null
+
+      switch (this.currentItem) {
+        case 'Услуги':
+          this.isSaveDialogServices = false
+          this.isOverScreen = false
+          break
+        case 'Абонементы':
+          this.isSaveDialogTickets = false
+          this.isOverScreen = false
+          break
+        case 'Группы':
+          this.isSaveDialogGroups = false
+          this.isOverScreen = false
+          break
+        case 'Индивидуалы':
+          this.isSaveDialogIndividuals = false
+          this.isOverScreen = false
+          break
       }
     },
 
     openSaveDialog() {
-      if (this.currentItem == 'Услуги') {
-        this.isSaveDialogServices = true
-        this.isOverScreen = true
-
-      } else if (this.currentItem == 'Абонементы') {
-        this.isSaveDialogTickets = true
-        this.isOverScreen = true
-      } else {
-        this.isSaveDialogIndividuals = true
-        this.isOverScreen = true
+      switch (this.currentItem) {
+        case 'Услуги':
+          this.isSaveDialogServices = true,
+          this.isOverScreen = true
+          break
+        case 'Абонементы':
+          this.isSaveDialogTickets = true
+          this.isOverScreen = true
+          break
+        case 'Группы':
+          this.isSaveDialogGroups = true
+          this.isOverScreen = true
+          break
+        case 'Индивидуалы':
+          this.isSaveDialogIndividuals = true
+          this.isOverScreen = true
+          break
       }
-
     },
 
     closeSaveDialog() {
-      if (this.currentItem == 'Услуги') {
-        this.servicesList.serviceName = ''
-        this.servicesList.serviceCost = 0
-
-        this.isSaveDialogServices = false
-        this.isOverScreen = false
-
-      } else if (this.currentItem == 'Абонементы') {
-        this.ticketsList.ticketCost = 0
-        this.ticketsList.ticketDiscount = 0
-        this.ticketsList.ticketVisits = 0
-        this.ticketsList.service_id = null
-        this.selectedServices = null
-
-        this.isSaveDialogTickets = false
-        this.isOverScreen = false
-      } else {
-        this.individualsList.individualName = ''
-        this.individualsList.service_id = null
-        this.isSaveDialogIndividuals = false
-        this.isOverScreen = false
+      switch (this.currentItem) {
+        case 'Услуги':
+          this.servicesList.serviceName = ''
+          this.servicesList.serviceCost = 0
+          this.isSaveDialogServices = false
+          this.isOverScreen = false
+          break
+        case 'Абонементы':
+          this.ticketsList.ticketCost = 0
+          this.ticketsList.ticketDiscount = 0
+          this.ticketsList.ticketVisits = 0
+          this.ticketsList.service_id = null
+          this.selectedServicesForTicket = null
+          this.isSaveDialogTickets = false
+          this.isOverScreen = false
+          break
+        case 'Группы':
+          this.groupsList.groupName = ''
+          this.groupsList.serviceId = null
+          this.selectedServicesForGroup = null
+          this.isSaveDialogGroups = false
+          this.isOverScreen = false
+          break
+        case 'Индивидуалы':
+          this.individualsList.individualName = ''
+          this.individualsList.service_id = null
+          this.selectedServicesForIndividual = null
+          this.isSaveDialogIndividuals = false
+          this.isOverScreen = false
+          break
       }
+    },
+
+    // открытие диалога подтверждения удаления 
+    openConfirmationDialog(deleteItem) {
+      this.currentDeleteItem = deleteItem
+      if ('service_name' in deleteItem) {
+        console.log('service')
+      } else if ('ticket_name' in deleteItem) {
+        console.log('ticket')
+      } else if ('group_name' in deleteItem) {
+        this.group = deleteItem
+        this.isDeleteGroupDialog = true
+        this.isOverScreen = true
+        console.log('group')
+      } else if ('individual_name' in deleteItem) {
+        this.individual = deleteItem
+        this.isDeleteIndividualDialog = true
+        this.isOverScreen = true
+        console.log('individual')
+      }
+    },
+
+    closeConfirmationDialog() {
+      if ('service_name' in this.currentDeleteItem) {
+        console.log('service')
+      } else if ('ticket_name' in this.currentDeleteItem) {
+        console.log('ticket')
+      } else if ('group_name' in this.currentDeleteItem) {
+        this.group = null
+        this.isDeleteGroupDialog = false
+        this.isOverScreen = false
+        console.log('group')
+      } else if ('individual_name' in this.currentDeleteItem) {
+        this.individual = null
+        this.isDeleteIndividualDialog = false
+        this.isOverScreen = false
+        console.log('individual')
+      }
+    },
+
+    // удаление группы из базы
+    deleteGroup() {
+      this.$store.dispatch("DELETE_GROUP", this.group.id);
+      this.currentDeleteItem = null
+      this.isDeleteGroupDialog = false;
+      this.isOverScreen = false;
+    },
+
+    // удаление индивидуала из базы
+    deleteIndividuals() {
+      this.$store.dispatch("DELETE_INDIVIDUAL", this.individual.id);
+      this.currentDeleteItem = null
+      this.isDeleteIndividualDialog = false;
+      this.isOverScreen = false;
     },
     ...mapActions([
       'GET_SERVICES',
       'GET_TICKETS',
-      'GET_INDIVIDUALS'
+      'GET_INDIVIDUALS',
+      'GET_GROUPS'
     ])
   },
 
   watch: {
     // следим за выбором услуги в абонементах
     selectedServicesForTicket() {
-      // опциональная цепочка "?" 
       this.ticketsList.service_id = this.selectedServicesForTicket?.id
     },
 
-    // следим за выбором услуги в преподавателях
-    selectedServicesForIndividuals() {
-      // опциональная цепочка "?" 
-      this.individualsList.service_id = this.selectedServicesForIndividuals?.id
+    // следим за выбором услуги в индивидуалах
+    selectedServicesForIndividual() {
+      this.individualsList.service_id = this.selectedServicesForIndividual?.id
+    },
+
+    // следим за выбором услуги в группе
+    selectedServicesForGroup() {
+      this.groupsList.serviceId = this.selectedServicesForGroup?.id
     },
 
     // вычисляем стоимость абонемента исходя из стоимости услуги, кол-ва посещений, и дисконта
@@ -412,10 +585,12 @@ export default {
       this.ticketsList.visitCost = this.computedVisitCost
     }
   },
+
   mounted() {
     this.GET_SERVICES();
     this.GET_TICKETS();
     this.GET_INDIVIDUALS();
+    this.GET_GROUPS();
   }
 }
 </script>

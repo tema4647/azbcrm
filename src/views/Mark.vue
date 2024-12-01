@@ -217,6 +217,7 @@ export default {
 
     // отметка посешения и списания денег со счета
     async toggleMark([client, cell, currentGroupOrIndividual]) {
+
       if (cell.isMarked) {
         alert('Повторная отметка посещения невозможна')
       } else {
@@ -240,49 +241,57 @@ export default {
         // определяем текущую стоимость списания в зависимости есть ли абонемент или нет, если абонемент есть спишется стоимость по абонементу, если нет спишеться стоимость услуги.
         const currentValue = currentTicketCost ? 0 : currentServiceCost
 
+
         // посещения
         this.visitList.client_id = client.id
         this.visitList.visit_date = cell.day
         this.visitList.service_id = currentGroupOrIndividual.services.id
         this.visitList.group_id = 'group_name' in currentGroupOrIndividual ? currentGroupOrIndividual.id : null
         this.visitList.individual_id = 'individual_name' in currentGroupOrIndividual ? currentGroupOrIndividual.id : null
-
+        await this.$store.dispatch('SET_VISITS', this.visitList)
 
         // транзакции
-        this.transactionList.client_id = client.id;
-        this.transactionList.transaction_type = 'списание',
-          this.transactionList.transaction_reason = 'оплата за услугу',
-          this.transactionList.transaction_account = currentTicket ? 'абонемент' : 'счет',
-          this.transactionList.transaction_amount = currentValue ? currentValue : currentTicket?.visit_cost;
+        this.transactionList.client_id = client.id
+        this.transactionList.transaction_type = 'списание'
+        this.transactionList.transaction_reason = currentGroupOrIndividual.services.service_name
+        this.transactionList.transaction_account = currentTicket ? 'абонемент' : 'счет'
+        this.transactionList.transaction_amount = currentValue ? currentValue : currentTicket?.visit_cost
         this.transactionList.transaction_date = this.currentDate
-
         await this.$store.dispatch('SET_TRANSACTIONS', this.transactionList)
 
-        await this.$store.dispatch('SET_VISITS', this.visitList)
 
         const result = +client.client_parent_amount - +currentValue
         this.clientId = client.id;
         this.clientsList.client_parent_amount = result.toFixed(2);
 
-        // меняем данные в сводной таблице 
-        if (currentTicket?.ticket_count != 0) {
+        // меняем остаток посещений и стоимость оставщихся посещений в сводной таблице 
+        if (currentTicket?.ticket_count >= 2) {
           this.clientsList.ticket_id = currentTicket?.id
           this.clientsList.ticket_count = currentTicket?.ticket_count - 1
           this.clientsList.ticket_current_amount = currentTicket?.ticket_current_amount - currentTicketCost
-
-          this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
         }
-
-
-        // удаляем запись/абонемент в сводной таблице
-        if (currentTicket?.ticket_count <= 1) {
+        // если остаток равен 1, удаляем запись/абонемент в сводной таблице
+        else if (currentTicket?.ticket_count == 1) {
           this.clientsList.ticket_id = currentTicket?.id
-          this.clientsList.detach = true
           this.clientsList.sync = false
-          this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
-        }
-      }
+          this.clientsList.detach = true
+        } 
 
+        this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
+        this.clientsList.client_child_fio = ''
+        this.clientsList.client_child_birth = null
+        this.clientsList.client_parent_fio = ''
+        this.clientsList.client_parent_phone = null
+        this.clientsList.client_parent_email =' '
+        this.clientsList.client_parent_amount = 0.00
+        this.clientsList.group_id = null
+        this.clientsList.ticket_id = null
+        this.clientsList.ticket_count = null
+        this.clientsList.ticket_current_amount = null
+        this.clientsList.sync = true
+        this.clientsList.detach = false
+        
+      }
     },
 
     // определение item в "SelectionList"
@@ -300,46 +309,40 @@ export default {
 
     // открытие диалога оплаты
     openPaymentDialog(client) {
-      this.clientId = client.id;
-      this.clientsList.client_child_fio = client.client_child_fio;
-      this.currentClientDeposit = client.client_parent_amount;
+      this.clientId = client.id
+      this.clientsList.client_child_fio = client.client_child_fio
+      this.currentClientDeposit = client.client_parent_amount
 
       // транзакции
-      this.transactionList.client_id = client.id;
-      this.transactionList.transaction_type = 'зачисление',
-        this.transactionList.transaction_reason = 'поплнение счета',
-        this.transactionList.transaction_account = 'счет',
-        this.transactionList.transaction_date = this.currentDate
+      this.transactionList.client_id = client.id
+      this.transactionList.transaction_type = 'зачисление'
+      this.transactionList.transaction_reason = 'поплнение счета'
+      this.transactionList.transaction_account = 'счет'
+      this.transactionList.transaction_date = this.currentDate
 
       this.isPaymentDialog = true
       this.isOverScreen = true
-
-
     },
 
-    // внесение денежных средств
+    // оплата
     async savePayment() {
       await this.$store.dispatch('SET_TRANSACTIONS', this.transactionList)
       this.transactionList.client_id = null;
       this.transactionList.transaction_amount = 0.00;
 
       this.$store.dispatch('PUT_CLIENT', [this.clientId, this.clientsList])
-      this.clientsList.client_child_fio = '';
-      this.clientsList.client_child_birth = '';
-      this.clientsList.client_parent_fio = '';
-      this.clientsList.client_parent_phone = '';
-      this.clientsList.client_parent_email = '';
-      this.clientsList.group_id = '';
-
-      this.currentClientAmount = 0.00;
-      this.currentClientDeposit = 0.00;
-
+      this.clientId = null
+      this.clientsList.client_child_fio = ''
+      this.currentClientDeposit = 0.00
       this.isPaymentDialog = false
       this.isOverScreen = false
     },
 
     // закрытие диалога оплаты
     closePaymentDialog() {
+      this.clientId = null
+      this.clientsList.client_child_fio = ''
+      this.currentClientDeposit = currentClientDeposit
       this.isPaymentDialog = false
       this.isOverScreen = false
     },
@@ -373,7 +376,7 @@ export default {
       this.transactionList.transaction_amount = currentClientAmount
     },
 
-    // следим за изменением текушей суммы и добовляем в clientSet
+    // следим за изменением текушей суммы и добовляем в clientsList
     currentSumm() {
       this.clientsList.client_parent_amount = this.currentSumm
     },

@@ -16,12 +16,6 @@
           </router-link>
         </li>
         <li class="list__item">
-          <router-link class="item__link" to="/groups">
-            <div class="icon-border"><font-awesome-icon icon="fa-solid fa-people-group" size="xs" /></div>
-            Группы
-          </router-link>
-        </li>
-        <li class="list__item">
           <router-link class="item__link" to="/mark">
             <div class="icon-border"><font-awesome-icon icon="fa-solid fa-marker" size="xs" /></div>
             Журнал

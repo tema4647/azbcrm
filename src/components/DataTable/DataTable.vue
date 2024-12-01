@@ -79,13 +79,10 @@ export default {
             this.$emit('deleteItem', item)
         }
     },
-
-
 }
 </script>
 
 <style lang="scss" scoped>
-.table-wrapper {}
 
 .table-header {
     height: 60px;

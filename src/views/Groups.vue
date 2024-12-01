@@ -107,8 +107,6 @@ export default {
           key: 'quantity',
           label: 'Кол-во'
         },
-        
-
       ],
 
     };
@@ -127,7 +125,6 @@ export default {
   },
 
   methods: {
-
     // открытие диалога сохранения группы
     openSaveDialog() {
       this.groupsList.groupName = ""
