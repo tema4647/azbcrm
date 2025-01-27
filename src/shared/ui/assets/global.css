@@ -1,0 +1,62 @@
+.btn-success {
+    background-color: #16a34a;
+}
+.btn-primary {
+    background-color: #2563eb;
+}
+.btn-danger {
+    background-color: #dc2626;
+}
+.btn-empty {
+    background-color: inherit;
+}
+
+.text-white {
+    color: white;
+}
+
+.text-black {
+    color: #616161;
+}
+
+/* button border */
+.btn-round {
+    border-radius: 100%;
+}
+
+.btn-rounded {
+    border-radius: 5px;
+}
+
+/* icon border */
+
+.icon-border {
+    width: 30px;
+    height: 30px;
+    border: 1px solid white;
+    padding: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    background: none;
+}
+
+.icon-border:hover {
+    color: var(--icon-hover);
+    transition: 0.3s all;
+}
+
+.icon-active {
+    color: var(--icon-hover);
+}
+
+.text-danger {
+    color: #dc2626;
+}
+
+.capitalize {
+    text-transform: capitalize;
+  }
