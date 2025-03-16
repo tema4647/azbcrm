@@ -19,6 +19,7 @@
         </AppButton>
         <Search v-model="searchClient" placeholder="Найти клиента" />
       </template>
+
     </DataTable>
 
     <!-- диалог добавления клиента в базу -->
@@ -126,7 +127,6 @@ export default {
 
   data() {
     return {
-      componentKey: 0,
       isSaveDialog: false,
       isEditDialog: false,
       isDeleteDialog: false,
